@@ -1,0 +1,10 @@
+PERFORMANCE
+
+- https://stackoverflow.com/a/21683480/170656
+
+import pyglet
+pyglet.options['debug_gl'] = False
+
+(arcade might already do this)
+
+
