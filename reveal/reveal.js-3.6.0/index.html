@@ -1,0 +1,292 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>reveal.js</title>
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/white.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <style>
+        .reveal pre {
+            width: unset;
+        }
+
+        .reveal mark {
+            color: whitesmoke;
+            background-color: #080e1b;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .reveal div.container {
+            font-size: 0.3em;
+        }
+
+        .reveal div.container p {
+            margin: 0;
+        }
+
+    </style>
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+        <section>
+            <h1>multiplayer 2D gaming</h1>
+            <h2>with python-arcade</h2>
+            <h3>@caleb_hattingh</h3>
+        </section>
+
+        <section>
+            <h2>about me</h2>
+            <p>blah</p>
+        </section>
+
+        <section>
+            <h2>about python-arcade</h2>
+            <p>created by paul craven</p>
+            <a href="http://arcade.academy/">http://arcade.academy</a>
+            <img width="48" height="48"
+                 data-src="img/penguin.png"
+                 alt="Down arrow">
+            <pre><code class="hljs bash" data-trim contenteditable>
+                        (venv) $ pip install arcade
+					</code></pre>
+            <img width="48" height="48"
+                 data-src="img/windows_icon.png"
+                 alt="Down arrow">
+            <pre><code class="hljs cmd" data-trim contenteditable>
+                        (venv) C:\mygame> pip install arcade
+					</code></pre>
+        </section>
+
+        <section>
+            <h2><u>lots</u> of examples</h2>
+            <ul>
+                <li>
+                    <pre><code class="hljs bash" data-trim data-noescape
+                               contenteditable>
+                        (venv) $ python -m arcade.examples.<mark>bouncing_ball</mark>
+					</code></pre>
+                </li>
+                <li>
+                    <pre><code class="hljs bash" data-trim data-noescape
+                               contenteditable>
+                        (venv) $ python -m arcade.examples.<mark>drawing_text</mark>
+					</code></pre>
+                </li>
+                <li>
+                    <pre><code class="hljs bash" data-trim data-noescape
+                               contenteditable>
+                        (venv) $ python -m arcade.examples.<mark>full_screen_example</mark>
+					</code></pre>
+                </li>
+                <li>
+                    <pre><code class="hljs bash" data-trim data-noescape
+                               contenteditable>
+                        (venv) $ python -m arcade.examples.<mark>sprite_move_keyboard</mark>
+					</code></pre>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2><u>lots</u> of examples</h2>
+            <div class="container">
+                <div class="col">
+                    <p> array_backed_grid.py</p>
+                    <p> array_backed_grid_buffered.py</p>
+                    <p> asteroid_smasher.py</p>
+                    <p> bouncing_ball.py</p>
+                    <p> bouncing_balls.py</p>
+                    <p> bouncing_rectangle.py</p>
+                    <p> decorator_drawing_example.py</p>
+                    <p> decorator_drawing_with_loops.py</p>
+                    <p> decorator_test.py</p>
+                    <p> drawing_primitives.py</p>
+                    <p> drawing_text.py</p>
+                    <p> drawing_with_functions.py</p>
+                    <p> drawing_with_loops.py</p>
+                    <p> full_screen_example.py</p>
+                    <p> gradients.py</p>
+                    <p> gui_text_button.py</p>
+                    <p> happy_face.py</p>
+                    <p> instruction_and_game_over_screens.py</p>
+                    <p> isometric_example.py</p>
+                    <p> joystick.py</p>
+                    <p> lines_buffered.py</p>
+                    <p> maze_depth_first.py</p>
+                    <p> maze_recursive.py</p>
+                    <p> mountains_midpoint_displacement.py</p>
+                    <p> mountains_random_walk.py</p>
+                    <p> move_joystick.py</p>
+                    <p> move_keyboard.py</p>
+                    <p> move_mouse.py</p>
+                    <p> nested_loops_bottom_left_triangle.py</p>
+                    <p> nested_loops_bottom_right_triangle.py</p>
+                    <p> nested_loops_box.py</p>
+                </div>
+                <div class="col">
+                    <p> nested_loops_top_left_triangle.py</p>
+                    <p> nested_loops_top_right_triangle.py</p>
+                    <p> pinball.py</p>
+                    <p> procedural_caves_bsp.py</p>
+                    <p> procedural_caves_cellular.py</p>
+                    <p> pymunk_2.py</p>
+                    <p> pymunk_box_stacks.py</p>
+                    <p> pymunk_pegboard.py</p>
+                    <p> radar_sweep.py</p>
+                    <p> resizable_window.py</p>
+                    <p> scratch.py</p>
+                    <p> shape_list_demo_1.py</p>
+                    <p> shape_list_demo_2.py</p>
+                    <p> shape_list_demo_3.py</p>
+                    <p> shape_list_demo_person.py</p>
+                    <p> shape_list_demo_skylines.py</p>
+                    <p> shape_list_non_center_rotate.py</p>
+                    <p> shapes.py</p>
+                    <p> snow.py</p>
+                    <p> sound.py</p>
+                    <p> sound_test.py</p>
+                    <p> sprite_bullets.py</p>
+                    <p> sprite_bullets_aimed.py</p>
+                    <p> sprite_bullets_enemy_aims.py</p>
+                    <p> sprite_bullets_periodic.py</p>
+                    <p> sprite_bullets_random.py</p>
+                    <p> sprite_change_coins.py</p>
+                    <p> sprite_collect_coins.py</p>
+                    <p> sprite_collect_coins_background.py</p>
+                    <p> sprite_collect_coins_diff_levels.py</p>
+                    <p> sprite_collect_coins_move_bouncing.py</p>
+                    <p> sprite_collect_coins_move_circle.py</p>
+                </div>
+                <div class="col">
+                    <p> sprite_collect_coins_move_down.py</p>
+                    <p> sprite_collect_coins_move_down_improved.py</p>
+                    <p> sprite_collect_rotating.py</p>
+                    <p> sprite_enemies_in_platformer.py</p>
+                    <p> sprite_explosion.py</p>
+                    <p> sprite_face_left_or_right.py</p>
+                    <p> sprite_follow_simple.py</p>
+                    <p> sprite_follow_simple_2.py</p>
+                    <p> sprite_move_animation.py</p>
+                    <p> sprite_move_joystick.py</p>
+                    <p> sprite_move_keyboard.py</p>
+                    <p> sprite_move_scrolling.py</p>
+                    <p> sprite_move_walls.py</p>
+                    <p> sprite_moving_platforms.py</p>
+                    <p> sprite_no_coins_on_walls.py</p>
+                    <p> sprite_ramps.py</p>
+                    <p> sprite_rooms.py</p>
+                    <p> sprite_simple_platformer.py</p>
+                    <p> sprite_tiled_map.py</p>
+                    <p> starting_template.py</p>
+                    <p> starting_template_simple.py</p>
+                    <p> stress_test_collision.py</p>
+                    <p> stress_test_draw_moving.py</p>
+                    <p> stress_test_draw_simple.py</p>
+                    <p> test.py</p>
+                    <p> test2.py</p>
+                    <p> test3.py</p>
+                    <p> timer.py</p>
+                </div>
+            </div>
+
+        </section>
+
+        <section>
+            <h2>step back: the big picture</h2>
+            <p>picture of server and networked PCs</p>
+        </section>
+
+        <section>
+            <h2>getting started with arcade</h2>
+            <p>basic description of a hello world</p>
+        </section>
+
+        <section>
+            <h2>tip #1: use a vector class</h2>
+            <p>Use the one in <b>pymunk</b></p>
+            <pre><code class="hljs python" data-trim data-noescape
+                       contenteditable>
+                    >>>from pymunk.vec2d import Vec2d
+                    >>> v = Vec2d(1, 2)
+                    >>> v.x
+                    1
+                    >>> v.y
+                    2
+                    >>> v + 100 * v
+                    Vec2d(101, 202)
+            </code></pre>
+        </section>
+
+        <section>
+            <h2>tip #2: saving and loading game data</h2>
+            <p>Use the one in <b>pyglet</b>!</p>
+            <p>(pyglet gets installed when you install arcade)</p>
+            <!--TODO: use pathlib-->
+            <!--TODO: also "appdirs" package: https://pypi.org/project/appdirs/-->
+            <pre><code class="hljs python" data-trim data-noescape
+                       contenteditable>
+                import os
+                import pyglet.resource
+
+                dir = pyglet.resource.get_settings_path('MyGame')
+
+                if not os.path.exists(dir):
+                    os.makedirs(dir)
+
+                filename = os.path.join(dir, 'highscores.txt')
+                with open(filename, 'wt') as f:
+                    f.write(new_scores)
+            </code></pre>
+        </section>
+    </div>
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.js"></script>
+
+<script>
+    // More info about config & dependencies:
+    // - https://github.com/hakimel/reveal.js#configuration
+    // - https://github.com/hakimel/reveal.js#dependencies
+    Reveal.initialize({
+        dependencies: [
+            {src: 'plugin/markdown/marked.js'},
+            {src: 'plugin/markdown/markdown.js'},
+            {src: 'plugin/notes/notes.js', async: true},
+            {
+                src: 'plugin/highlight/highlight.js',
+                async: true,
+                callback: function () {
+                    hljs.initHighlightingOnLoad();
+                }
+            }
+        ]
+    });
+</script>
+</body>
+</html>
