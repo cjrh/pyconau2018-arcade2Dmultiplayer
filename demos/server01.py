@@ -47,7 +47,7 @@ async def main():
     listen = loop.create_datagram_endpoint(
         ServerProtocol, local_addr=('127.0.0.1', 25000)
     )
-    transport, protocol = loop.run_until_complete(listen)
+    transport, protocol = await listen
     try:
         await asyncio.sleep(100000)
     except asyncio.CancelledError:
@@ -55,7 +55,7 @@ async def main():
 
 
 if __name__ == '__main__':
-    if sys.platform == 'win32':
+    if 0 and sys.platform == 'win32':
         loop = asyncio.ProactorEventLoop()
         asyncio.set_event_loop(loop)
     else:
