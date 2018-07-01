@@ -1,49 +1,77 @@
 import logging
 import sys
 import asyncio
+from contextlib import suppress
+from typing import Dict, Tuple
 
 
-CLIENTS = set()
+logger = logging.getLogger(__name__)
+
 
 class Player:
-    def __init__(self):
-        self.queue_input = asyncio.Queue()
-        self.queue_state = asyncio.Queue()
+    def __init__(self, transport, addr):
+        self.transport = transport
+        self.addr = addr
+
+    def send(self, new_state):
+        self.transport.sendto(new_state, self.addr)
+
+
+def handle_cancellation(f):
+    async def inner(*args, **kwargs):
+        with suppress(asyncio.CancelledError):
+            return await f(*args, **kwargs)
+    return inner
 
 
 class ServerProtocol:
+    def __init__(self):
+        self.players: Dict[str, Player] = {}
+        self.state_queue: asyncio.Queue[bytes] = asyncio.Queue()
+        self.input_queue: asyncio.Queue[Tuple[Player, bytes]] = asyncio.Queue()
+        self.brain_task = loop.create_task(self.game_brain())
+        self.state_sender_task = loop.create_task(self.state_sender())
+
     def connection_made(self, transport):
+        logger.info('connection made')
         self.transport = transport
-        self.player = Player()
-        self.sender_task = loop.create_task(self.sender())
-        CLIENTS.add(self.player)
 
     def connection_lost(self, transport):
-        # transport will be None
-        print('Connection lost')
-        CLIENTS.remove(self.player)
-        self.sender_task.cancel()
+        logger.info('Connection lost')
 
-    async def sender(self):
-        try:
-            while True:
-                state = await self.player.queue_state.get()
-                self.transport.sendto(state, self.addr)
-        except asyncio.CancelledError:
-            pass
+    @handle_cancellation
+    async def game_brain(self):
+        while True:
+            player, new_input = await self.input_queue.get()
+            new_state = b'new state!'  # This is a big calculation
+            await self.state_queue.put(new_state)
+
+    @handle_cancellation
+    async def state_sender(self):
+        # print('start up state sender')
+        while True:
+            new_state = await self.state_queue.get()
+            # All players get the new game state
+            for p in self.players.values():
+                p.send(new_state)
 
     def datagram_received(self, data, addr):
-        self.addr = addr
+        if data == b'JOIN':
+            self.players[addr] = Player(self.transport, addr)
+            return
+        elif data == b'LEAVE':
+            del self.players[addr]
+            return
+
+        # This means game input was received.
         message = data.decode()
-        print('Received %r from %s' % (message, addr))
-        print('Send %r to %s' % (message, addr))
-        self.player.queue_input.put_nowait(data)
-        # Wait here until response is ready to go?
-        # self.transport.sendto(data, addr)
+        logger.debug('Received %r from %s' % (message, addr))
+        logger.debug('Send %r to %s' % (message, addr))
+        new_input = (self.players[addr], data)
+        self.input_queue.put_nowait(new_input)
 
 
 async def main():
-    loop = asyncio.get_event_loop()
     listen = loop.create_datagram_endpoint(
         ServerProtocol, local_addr=('127.0.0.1', 25000)
     )
