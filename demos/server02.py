@@ -1,52 +1,11 @@
 import asyncio
 import time
 from asyncio import run, create_task, CancelledError
-from typing import List
-import json
 
 import zmq
-import dataclasses
-from dataclasses import dataclass, asdict
 from zmq.asyncio import Context, Socket
 from pymunk.vec2d import Vec2d
-
-
-@dataclass
-class PlayerEvent:
-    left: bool
-    right: bool
-    up: bool
-    down: bool
-
-
-@dataclass
-class PlayerState:
-    updated: float = 0
-    x: float = 0
-    y: float = 0
-    speed: float = 0
-    health: float = 0
-    ammo: float = 0
-    score: int = 0
-
-
-@dataclass
-class GameState:
-    player_states: List[PlayerState]
-    game_seconds: int
-
-    def to_json(self):
-        d = dict(
-            player_states=[asdict(p) for p in self.player_states],
-            game_seconds=self.game_seconds
-        )
-        return json.dumps(d)
-
-    def from_json(self, data):
-        d = json.loads(data)
-        self.game_seconds = d['game_seconds']
-        for i, p in enumerate(d['player_states']):
-            self.player_states[i] = PlayerState(**p)
+from .lib02 import PlayerEvent, PlayerState, GameState
 
 
 def update_game_state(gs: GameState, event: PlayerEvent):
@@ -95,13 +54,15 @@ async def ticker(sock1, sock2):
     s = gs.to_json()
     print(s)
 
+    # A task to receive keyboard and mouse inputs from players.
+    # This will also update the game state, gs.
     create_task(update_from_client(gs, sock2))
 
-    # Send out the game state regularly
-    tick_rate_Hz = 60
+    # Send out the game state to all players 60 times per second.
+    tick_rate_hz = 60
     while True:
         await sock1.send_string(gs.to_json())
-        await asyncio.sleep(1 / tick_rate_Hz)
+        await asyncio.sleep(1 / tick_rate_hz)
 
 
 async def main():
@@ -114,8 +75,7 @@ async def main():
     sock_recv_player_evts.bind('tcp://*:25001')
 
     try:
-        create_task(ticker(sock_push_gamestate, sock_recv_player_evts))
-        await asyncio.sleep(1000000)
+        await ticker(sock_push_gamestate, sock_recv_player_evts)
     except CancelledError:
         print('Cancelled')
     finally:
