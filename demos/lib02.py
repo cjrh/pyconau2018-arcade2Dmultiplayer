@@ -5,10 +5,10 @@ from dataclasses import dataclass, asdict
 
 @dataclass
 class PlayerEvent:
-    left: bool
-    right: bool
-    up: bool
-    down: bool
+    left: bool = False
+    right: bool = False
+    up: bool = False
+    down: bool = False
 
     def asdict(self):
         return asdict(self)

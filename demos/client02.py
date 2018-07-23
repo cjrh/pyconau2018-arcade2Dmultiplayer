@@ -15,6 +15,7 @@ RECT_WIDTH = 50
 RECT_HEIGHT = 50
 
 MOVEMENT_SPEED = 5
+UPDATE_TICK = 60
 
 MOVE_MAP = {
     arcade.key.UP: Vec2d(0, 1),
@@ -50,8 +51,13 @@ class MyGame(arcade.Window):
         super().__init__(width, height, title="Multiplayer Demo")
         self.player = Rectangle(
             0, 0, RECT_WIDTH, RECT_HEIGHT, 0, arcade.color.WHITE)
-        self.player_state = PlayerState()
-        self.game_state = GameState()
+        self.player_event = PlayerEvent()
+        self.game_state = GameState(
+            player_states=[
+                PlayerState()
+            ],
+            game_seconds=0
+        )
 
     def setup(self):
         x = SCREEN_WIDTH // 2
@@ -60,20 +66,43 @@ class MyGame(arcade.Window):
 
     def update(self, dt):
         # TODO: actually nothing to do here (until interpolation)
-        self.player.move()
+        # self.player.move()
+        pass
 
     def on_draw(self):
         arcade.start_render()
         # TODO: draw the full game state
+        self.player.position.x = self.game_state.player_states[0].x
+        self.player.position.y = self.game_state.player_states[0].y
+
         self.player.draw()
 
     def on_key_press(self, key, modifiers):
         # TODO: update the player state
-        self.player.movement[key] = MOVE_MAP[key] * MOVEMENT_SPEED
+        # self.player.movement[key] = MOVE_MAP[key] * MOVEMENT_SPEED
+        print(key)
+        self.player_event.left |= key == arcade.key.LEFT
+        self.player_event.right |= key == arcade.key.RIGHT
+        self.player_event.up |= key == arcade.key.UP
+        self.player_event.down |= key == arcade.key.DOWN
 
     def on_key_release(self, key, modifiers):
+        print(key)
         # TODO: update the player state
-        del self.player.movement[key]
+        # del self.player.movement[key]
+        self.player_event.left ^= key == arcade.key.LEFT
+        self.player_event.right ^= key == arcade.key.RIGHT
+        self.player_event.up ^= key == arcade.key.UP
+        self.player_event.down ^= key == arcade.key.DOWN
+
+        # if arcade.key.LEFT:
+        #     self.player_event.left = False
+        # elif arcade.key.RIGHT:
+        #     self.player_event.right = False
+        # elif arcade.key.UP:
+        #     self.player_event.up = False
+        # elif arcade.key.DOWN:
+        #     self.player_event.down = False
 
 
 async def thread_main(window: MyGame, loop):
@@ -81,6 +110,7 @@ async def thread_main(window: MyGame, loop):
 
     sub_sock: Socket = ctx.socket(zmq.SUB)
     sub_sock.connect('tcp://localhost:25000')
+    sub_sock.subscribe('')
 
     push_sock: Socket = ctx.socket(zmq.PUSH)
     push_sock.connect('tcp://localhost:25001')
@@ -88,12 +118,15 @@ async def thread_main(window: MyGame, loop):
     async def pusher():
         """Push the player's INPUT state 60 times per second"""
         while True:
-            await push_sock.send_json(window.player_state.asdict())
-            await asyncio.sleep(1 / 60)
+            d = window.player_event.asdict()
+            # print(d)
+            await push_sock.send_json(d)
+            await asyncio.sleep(1 / UPDATE_TICK)
 
     async def receive_game_state():
         while True:
             gs_string = await sub_sock.recv_string()
+            print('.', end='', flush=True)
             window.game_state.from_json(gs_string)
 
     try:

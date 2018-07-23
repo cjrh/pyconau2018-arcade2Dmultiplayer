@@ -44,15 +44,16 @@ def update_game_state(gs: GameState, event: PlayerEvent):
 
 async def update_from_client(gs: GameState, sock: Socket):
     while True:
-        event = await sock.recv_string()
+        event_dict = await sock.recv_json()
+        print(f'Got event dict: {event_dict}')
+        event = PlayerEvent(**event_dict)
         update_game_state(gs, event)
 
 
 async def ticker(sock1, sock2):
-    ps = PlayerState()
+    ps = PlayerState(speed=200)
     gs = GameState(player_states=[ps], game_seconds=1)
     s = gs.to_json()
-    print(s)
 
     # A task to receive keyboard and mouse inputs from players.
     # This will also update the game state, gs.
@@ -62,6 +63,7 @@ async def ticker(sock1, sock2):
     tick_rate_hz = 60
     while True:
         await sock1.send_string(gs.to_json())
+        # print('.', end='', flush=True)
         await asyncio.sleep(1 / tick_rate_hz)
 
 
