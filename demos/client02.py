@@ -1,5 +1,7 @@
 import asyncio
 import threading
+import time
+from collections import deque
 from typing import Dict
 import zmq
 from zmq.asyncio import Context, Socket
@@ -58,27 +60,53 @@ class MyGame(arcade.Window):
             ],
             game_seconds=0
         )
+        self.position_buffer = deque(maxlen=3)
+        self.last_update = 0
+        self.render_time = 0
 
     def setup(self):
         x = SCREEN_WIDTH // 2
         y = SCREEN_HEIGHT // 2
         self.player.position += Vec2d(x, y)
 
+    def lerp(self, v0: float, v1: float, t: float):
+        if t > 1:
+            t = 1
+        return (1 - t) * v0 + t * v1
+
     def update(self, dt):
         # TODO: actually nothing to do here (until interpolation)
         # self.player.move()
-        pass
+        if len(self.position_buffer) < 2:
+            return
+
+        v0, t0 = self.position_buffer[0]
+        v1, t1 = self.position_buffer[1]
+
+        if t0 == t1:
+            return
+
+        # v0 = self.player.position
+
+        # self.player.position = v1
+        # return
+
+        self.player.position = self.lerp(v0, v1, self.render_time - self.last_update)
+
+        # self.player.position.x = self.game_state.player_states[0].x
+        # self.player.position.y = self.game_state.player_states[0].y
+
+        self.render_time += dt
 
     def on_draw(self):
         arcade.start_render()
         # TODO: draw the full game state
-        self.player.position.x = self.game_state.player_states[0].x
-        self.player.position.y = self.game_state.player_states[0].y
+        # self.player.position.x = self.game_state.player_states[0].x
+        # self.player.position.y = self.game_state.player_states[0].y
 
         self.player.draw()
 
     def on_key_press(self, key, modifiers):
-        # TODO: update the player state
         # self.player.movement[key] = MOVE_MAP[key] * MOVEMENT_SPEED
         print(key)
         self.player_event.left |= key == arcade.key.LEFT
@@ -87,22 +115,11 @@ class MyGame(arcade.Window):
         self.player_event.down |= key == arcade.key.DOWN
 
     def on_key_release(self, key, modifiers):
-        print(key)
-        # TODO: update the player state
         # del self.player.movement[key]
         self.player_event.left ^= key == arcade.key.LEFT
         self.player_event.right ^= key == arcade.key.RIGHT
         self.player_event.up ^= key == arcade.key.UP
         self.player_event.down ^= key == arcade.key.DOWN
-
-        # if arcade.key.LEFT:
-        #     self.player_event.left = False
-        # elif arcade.key.RIGHT:
-        #     self.player_event.right = False
-        # elif arcade.key.UP:
-        #     self.player_event.up = False
-        # elif arcade.key.DOWN:
-        #     self.player_event.down = False
 
 
 async def thread_main(window: MyGame, loop):
@@ -126,8 +143,16 @@ async def thread_main(window: MyGame, loop):
     async def receive_game_state():
         while True:
             gs_string = await sub_sock.recv_string()
-            print('.', end='', flush=True)
+            # print('.', end='', flush=True)
             window.game_state.from_json(gs_string)
+            ps = window.game_state.player_states[0]
+            t = time.time()
+            window.position_buffer.append(
+                (Vec2d(ps.x, ps.y), t)
+            )
+            window.position_buffer[0] = (window.player.position, t - 1/30)
+            window.last_update = t
+            window.render_time = t
 
     try:
         await asyncio.gather(pusher(), receive_game_state())

@@ -51,7 +51,7 @@ async def update_from_client(gs: GameState, sock: Socket):
 
 
 async def ticker(sock1, sock2):
-    ps = PlayerState(speed=200)
+    ps = PlayerState(speed=150)
     gs = GameState(player_states=[ps], game_seconds=1)
     s = gs.to_json()
 
