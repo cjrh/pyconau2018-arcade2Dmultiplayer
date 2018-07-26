@@ -51,7 +51,7 @@ async def update_from_client(gs: GameState, sock: Socket):
 
 
 async def ticker(sock1, sock2):
-    ps = PlayerState(speed=150)
+    ps = PlayerState(speed=300)
     gs = GameState(player_states=[ps], game_seconds=1)
     s = gs.to_json()
 
@@ -60,7 +60,7 @@ async def ticker(sock1, sock2):
     create_task(update_from_client(gs, sock2))
 
     # Send out the game state to all players 60 times per second.
-    tick_rate_hz = 60
+    tick_rate_hz = 20
     while True:
         await sock1.send_string(gs.to_json())
         # print('.', end='', flush=True)

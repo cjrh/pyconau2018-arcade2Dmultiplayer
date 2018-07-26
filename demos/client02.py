@@ -17,7 +17,7 @@ RECT_WIDTH = 50
 RECT_HEIGHT = 50
 
 MOVEMENT_SPEED = 5
-UPDATE_TICK = 10
+UPDATE_TICK = 30
 
 MOVE_MAP = {
     arcade.key.UP: Vec2d(0, 1),
@@ -61,8 +61,7 @@ class MyGame(arcade.Window):
             game_seconds=0
         )
         self.position_buffer = deque(maxlen=3)
-        self.last_update = 0
-        self.render_time = 0
+        self.t = 0
 
     def setup(self):
         x = SCREEN_WIDTH // 2
@@ -86,24 +85,16 @@ class MyGame(arcade.Window):
         if t0 == t1:
             return
 
-        # v0 = self.player.position
+        x = (self.t - t0) / (t1 - t0)
+        print(f'{dt:8.4f} {x:8.3} {self.t:16.4} {t0:16.4} {t1:16.4} {t1 - t0:8.3}')
+        self.player.position = self.lerp(
+            self.player.position, v1, x
+        )
 
-        # self.player.position = v1
-        # return
-
-        self.player.position = self.lerp(v0, v1, self.render_time - self.last_update)
-
-        # self.player.position.x = self.game_state.player_states[0].x
-        # self.player.position.y = self.game_state.player_states[0].y
-
-        self.render_time += dt
+        self.t += dt
 
     def on_draw(self):
         arcade.start_render()
-        # TODO: draw the full game state
-        # self.player.position.x = self.game_state.player_states[0].x
-        # self.player.position.y = self.game_state.player_states[0].y
-
         self.player.draw()
 
     def on_key_press(self, key, modifiers):
@@ -150,9 +141,7 @@ async def thread_main(window: MyGame, loop):
             window.position_buffer.append(
                 (Vec2d(ps.x, ps.y), t)
             )
-            window.position_buffer[0] = (window.player.position, t - 1/30)
-            window.last_update = t
-            window.render_time = t
+            window.t = window.position_buffer[0][1]
 
     try:
         await asyncio.gather(pusher(), receive_game_state())
