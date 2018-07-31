@@ -1,3 +1,4 @@
+import logging
 import asyncio
 import threading
 import time
@@ -10,6 +11,8 @@ from pymunk.vec2d import Vec2d
 from .lib02 import PlayerEvent, PlayerState, GameState
 
 
+logger = logging.getLogger(__name__)
+logger.setLevel('INFO')
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
@@ -17,7 +20,7 @@ RECT_WIDTH = 50
 RECT_HEIGHT = 50
 
 MOVEMENT_SPEED = 5
-UPDATE_TICK = 30
+UPDATE_TICK = 15
 
 MOVE_MAP = {
     arcade.key.UP: Vec2d(0, 1),
@@ -86,7 +89,7 @@ class MyGame(arcade.Window):
             return
 
         x = (self.t - t0) / (t1 - t0)
-        print(f'{dt:8.4f} {x:8.3} {self.t:16.4} {t0:16.4} {t1:16.4} {t1 - t0:8.3}')
+        logger.debug(f'{dt:8.4f} {x:8.3} {self.t:16.4} {t0:16.4} {t1:16.4} {t1 - t0:8.3}')
         self.player.position = self.lerp(
             self.player.position, v1, x
         )
@@ -99,7 +102,7 @@ class MyGame(arcade.Window):
 
     def on_key_press(self, key, modifiers):
         # self.player.movement[key] = MOVE_MAP[key] * MOVEMENT_SPEED
-        print(key)
+        logger.debug(key)
         self.player_event.left |= key == arcade.key.LEFT
         self.player_event.right |= key == arcade.key.RIGHT
         self.player_event.up |= key == arcade.key.UP
@@ -127,14 +130,14 @@ async def thread_main(window: MyGame, loop):
         """Push the player's INPUT state 60 times per second"""
         while True:
             d = window.player_event.asdict()
-            # print(d)
+            # logger.debug(d)
             await push_sock.send_json(d)
             await asyncio.sleep(1 / UPDATE_TICK)
 
     async def receive_game_state():
         while True:
             gs_string = await sub_sock.recv_string()
-            # print('.', end='', flush=True)
+            # logger.debug('.', end='', flush=True)
             window.game_state.from_json(gs_string)
             ps = window.game_state.player_states[0]
             t = time.time()

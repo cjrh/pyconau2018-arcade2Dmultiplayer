@@ -8,6 +8,9 @@ from pymunk.vec2d import Vec2d
 from .lib02 import PlayerEvent, PlayerState, GameState
 
 
+SERVER_UPDATE_TICK_HZ = 10
+
+
 def update_game_state(gs: GameState, event: PlayerEvent):
     """This is the main engine of the game"""
     # TODO: look up player index
@@ -60,11 +63,10 @@ async def ticker(sock1, sock2):
     create_task(update_from_client(gs, sock2))
 
     # Send out the game state to all players 60 times per second.
-    tick_rate_hz = 20
     while True:
         await sock1.send_string(gs.to_json())
         # print('.', end='', flush=True)
-        await asyncio.sleep(1 / tick_rate_hz)
+        await asyncio.sleep(1 / SERVER_UPDATE_TICK_HZ)
 
 
 async def main():
