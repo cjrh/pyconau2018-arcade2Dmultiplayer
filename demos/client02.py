@@ -1,3 +1,4 @@
+import copy
 import logging
 import asyncio
 import threading
@@ -90,9 +91,35 @@ class MyGame(arcade.Window):
 
         x = (self.t - t0) / (t1 - t0)
         logger.debug(f'{dt:8.4f} {x:8.3} {self.t:16.4} {t0:16.4} {t1:16.4} {t1 - t0:8.3}')
-        self.player.position = self.lerp(
+
+        netcode_position = self.lerp(
             self.player.position, v1, x
         )
+
+        speed = 500
+        dx = 0
+        dy = 0
+        if self.player_event.left:
+            dx -= speed * dt
+        if self.player_event.right:
+            dx += speed * dt
+        if self.player_event.up:
+            dy += speed * dt
+        if self.player_event.down:
+            dy -= speed * dt
+
+        local_position = copy.copy(self.player.position)
+        local_position.x += dx
+        local_position.y += dy
+
+        # So here we have the netcode position, and the local position.
+        # Let's interpolate between them!
+        self.player.position.x = (netcode_position.x + local_position.x) / 2
+        self.player.position.y = (netcode_position.y + local_position.y) / 2
+
+        # self.player.position = self.lerp(
+        #     self.player.position, v1, x
+        # )
 
         self.t += dt
 
