@@ -9,6 +9,8 @@ import zmq
 from zmq.asyncio import Context, Socket
 import arcade
 from pymunk.vec2d import Vec2d
+
+from demos.movement import KeysPressed, MOVE_MAP, apply_movement
 from .lib02 import PlayerEvent, PlayerState, GameState
 
 
@@ -22,13 +24,6 @@ RECT_HEIGHT = 50
 
 MOVEMENT_SPEED = 5
 UPDATE_TICK = 15
-
-MOVE_MAP = {
-    arcade.key.UP: Vec2d(0, 1),
-    arcade.key.DOWN: Vec2d(0, -1),
-    arcade.key.LEFT: Vec2d(-1, 0),
-    arcade.key.RIGHT: Vec2d(1, 0),
-}
 
 
 class Rectangle:
@@ -55,6 +50,7 @@ class Rectangle:
 class MyGame(arcade.Window):
     def __init__(self, width, height):
         super().__init__(width, height, title="Multiplayer Demo")
+        self.keys_pressed = KeysPressed()
         self.player = Rectangle(
             0, 0, RECT_WIDTH, RECT_HEIGHT, 0, arcade.color.WHITE)
         self.player_event = PlayerEvent()
@@ -78,47 +74,41 @@ class MyGame(arcade.Window):
         return (1 - t) * v0 + t * v1
 
     def update(self, dt):
-        # TODO: actually nothing to do here (until interpolation)
-        # self.player.move()
+        # Calculate position using only local information (nothing from server)
+        speed = 500 - 10
+        local_position = apply_movement(speed, dt, self.player.position, self.keys_pressed)
+
+        # Now calculate the new position based on the server information
         if len(self.position_buffer) < 2:
             return
 
         v0, t0 = self.position_buffer[0]
         v1, t1 = self.position_buffer[1]
 
+        # Now we're here: how to draw the new position in such a way that
+        # looks completely smooth but also accurately reflects where the
+        # SERVER thinks we are?
         if t0 == t1:
             return
 
         x = (self.t - t0) / (t1 - t0)
-        logger.debug(f'{dt:8.4f} {x:8.3} {self.t:16.4} {t0:16.4} {t1:16.4} {t1 - t0:8.3}')
-
         netcode_position = self.lerp(
             self.player.position, v1, x
         )
 
-        speed = 500
-        dx = 0
-        dy = 0
-        if self.player_event.left:
-            dx -= speed * dt
-        if self.player_event.right:
-            dx += speed * dt
-        if self.player_event.up:
-            dy += speed * dt
-        if self.player_event.down:
-            dy -= speed * dt
+        interp_position = self.lerp(
+            local_position, v1, x
+        )
 
-        local_position = copy.copy(self.player.position)
-        local_position.x += dx
-        local_position.y += dy
+        self.player.position = interp_position
 
-        # So here we have the netcode position, and the local position.
-        # Let's interpolate between them!
-        self.player.position.x = (netcode_position.x + local_position.x) / 2
-        self.player.position.y = (netcode_position.y + local_position.y) / 2
-
-        # self.player.position = self.lerp(
-        #     self.player.position, v1, x
+        # # So here we have the netcode position, and the local position.
+        # # Let's interpolate between them!
+        # ratio = 0.5
+        # netcode_position = v1
+        # self.player.position = (
+        #         netcode_position * ratio
+        #         + local_position * (1 - ratio)
         # )
 
         self.t += dt
@@ -130,17 +120,13 @@ class MyGame(arcade.Window):
     def on_key_press(self, key, modifiers):
         # self.player.movement[key] = MOVE_MAP[key] * MOVEMENT_SPEED
         logger.debug(key)
-        self.player_event.left |= key == arcade.key.LEFT
-        self.player_event.right |= key == arcade.key.RIGHT
-        self.player_event.up |= key == arcade.key.UP
-        self.player_event.down |= key == arcade.key.DOWN
+        self.player_event.keys[key] = True
+        self.keys_pressed.keys[key] = True
 
     def on_key_release(self, key, modifiers):
         # del self.player.movement[key]
-        self.player_event.left ^= key == arcade.key.LEFT
-        self.player_event.right ^= key == arcade.key.RIGHT
-        self.player_event.up ^= key == arcade.key.UP
-        self.player_event.down ^= key == arcade.key.DOWN
+        self.player_event.keys[key] = False
+        self.keys_pressed.keys[key] = False
 
 
 async def thread_main(window: MyGame, loop):

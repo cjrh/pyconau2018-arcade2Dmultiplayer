@@ -1,14 +1,16 @@
-from typing import List
+from typing import List, Dict
 import json
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
+from arcade import key
+from demos.movement import KEYS
 
 
 @dataclass
 class PlayerEvent:
-    left: bool = False
-    right: bool = False
-    up: bool = False
-    down: bool = False
+    keys: Dict = field(default_factory=lambda: {k: False for k in KEYS})
+
+    def __post_init__(self):
+        self.keys = {int(k): v for k, v in self.keys.items()}
 
     def asdict(self):
         return asdict(self)
@@ -45,3 +47,10 @@ class GameState:
         self.game_seconds = d['game_seconds']
         for i, p in enumerate(d['player_states']):
             self.player_states[i] = PlayerState(**p)
+
+
+if __name__ == '__main__':
+    pe = PlayerEvent()
+    print(pe)
+    print(pe.asdict())
+    assert pe.asdict() == {'keys': {65362: False, 65364: False, 65361: False, 65363: False}}

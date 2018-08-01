@@ -6,6 +6,7 @@ import zmq
 from zmq.asyncio import Context, Socket
 from pymunk.vec2d import Vec2d
 from .lib02 import PlayerEvent, PlayerState, GameState
+from demos.movement import KeysPressed, apply_movement
 
 
 SERVER_UPDATE_TICK_HZ = 10
@@ -16,19 +17,14 @@ def update_game_state(gs: GameState, event: PlayerEvent):
     # TODO: look up player index
     player_state = gs.player_states[0]
 
-    dt = time.time() - player_state.updated
+    dt = time.time() - (player_state.updated - 50e-3)
 
-    if event.left:
-        player_state.x -= player_state.speed * dt
-
-    if event.right:
-        player_state.x += player_state.speed * dt
-
-    if event.up:
-        player_state.y += player_state.speed * dt
-
-    if event.down:
-        player_state.y -= player_state.speed * dt
+    current_position = Vec2d(player_state.x, player_state.y)
+    current_position = apply_movement(
+        player_state.speed, dt, current_position, event
+    )
+    player_state.x = current_position.x
+    player_state.y = current_position.y
 
     # Constraints
     if player_state.x < 0:
