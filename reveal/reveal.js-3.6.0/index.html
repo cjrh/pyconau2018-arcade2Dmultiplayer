@@ -57,6 +57,8 @@
             <h1>multiplayer 2D gaming</h1>
             <h2>with python-arcade</h2>
             <h3>@caleb_hattingh</h3>
+            <button class="runprogram" cmd="server02">server02</button>
+            <button class="runprogram" cmd="client02">client02</button>
         </section>
 
         <section>
@@ -231,14 +233,20 @@
             <p>Use the one in <b>pymunk</b></p>
             <pre><code class="hljs python" data-trim data-noescape
                        contenteditable>
-                    >>>from pymunk.vec2d import Vec2d
-                    >>> v = Vec2d(1, 2)
+                    >>> from pymunk.vec2d import Vec2d
+                    >>> v = Vec2d(3, 4)
                     >>> v.x
-                    1
+                    3
                     >>> v.y
-                    2
-                    >>> v + 100 * v
-                    Vec2d(101, 202)
+                    4
+                    >>>
+                    >>> v + 2 * v
+                    Vec2d(9, 12)
+                    >>> v.length
+                    5.0
+                    >>> v.length = 1
+                    >>> v
+                    Vec2d(0.6, 0.8)
             </code></pre>
         </section>
 
@@ -303,6 +311,48 @@
             }
         ]
     });
+</script>
+<script>
+    var btns = document.getElementsByClassName("runprogram");
+    for (var i = 0; i < btns.length; i++) {
+        btns[i].addEventListener("click", function(event) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", '/runprog', true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function() {//Call a function when the state changes.
+                if(this.readyState == XMLHttpRequest.DONE && this.status == 200) {
+                    // Request finished. Do processing here.
+                    console.log('Done')
+                }
+            };
+            // xhr.send("foo=bar&lorem=ipsum");
+            var btn = event.target;
+            var data = {};
+            for(var i = btn.attributes.length - 1; i >= 0; i--) {
+                data[btn.attributes[i].name] = btn.attributes[i].value
+            }
+            console.log(data);
+            xhr.send(JSON.stringify(data));
+        })
+    }
+    // document.getElementById("b1").addEventListener("click", function(event) {
+    //     var xhr = new XMLHttpRequest();
+    //     xhr.open("POST", '/runprog', true);
+    //     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    //     xhr.onreadystatechange = function() {//Call a function when the state changes.
+    //         if(this.readyState == XMLHttpRequest.DONE && this.status == 200) {
+    //             // Request finished. Do processing here.
+    //             console.log('Done')
+    //         }
+    //     };
+    //     // xhr.send("foo=bar&lorem=ipsum");
+    //     var data = {};
+    //     for(var i = this.attributes.length - 1; i >= 0; i--) {
+    //         data[this.attributes[i].name] = this.attributes[i].value
+    //     }
+    //     console.log(data);
+    //     xhr.send(JSON.stringify(data));
+    // })
 </script>
 </body>
 </html>

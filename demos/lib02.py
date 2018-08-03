@@ -3,6 +3,7 @@ import json
 from dataclasses import dataclass, asdict, field
 from arcade import key
 from demos.movement import KEYS
+from pymunk.vec2d import Vec2d
 
 
 @dataclass
@@ -28,6 +29,12 @@ class PlayerState:
 
     def asdict(self):
         return asdict(self)
+
+    def update_position(self, posn: Vec2d):
+        self.x = posn.x
+        self.y = posn.y
+
+
 
 
 @dataclass
