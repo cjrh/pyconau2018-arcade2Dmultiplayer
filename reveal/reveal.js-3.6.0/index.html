@@ -39,6 +39,10 @@
             margin: 0;
         }
 
+        .reveal section img {
+            border: none;
+        }
+
     </style>
 
     <!-- Printing and PDF exports -->
@@ -64,7 +68,7 @@
         <section>
             <h2>about me</h2>
             <ul>
-                <li>Team lead at PCCW Global: network automation</li>
+                <li>Network automation team lead at PCCW Global</li>
                 <li>❤ Python since ~ 2001️</li>
             </ul>
             <div>
@@ -79,27 +83,35 @@
                         April 2018</p>
                     <img src="/img/aiocover.png"
                          height="250"
-                         alt="Cover of 20 Python Libs book" />
+                         alt="Cover of 20 Python Libs book"/>
                 </div>
             </div>
         </section>
 
         <section>
             <h2>about python-arcade</h2>
-            <p>created by paul craven</p>
-            <a href="http://arcade.academy/">http://arcade.academy</a>
-            <img width="48" height="48"
-                 data-src="img/penguin.png"
-                 alt="Down arrow">
-            <pre><code class="hljs bash" data-trim contenteditable>
+            <p>created by paul craven ●
+                <a href="http://arcade.academy/">http://arcade.academy</a>
+            </p>
+            <div style="display: flex;margin: auto">
+                <img
+                     width="48" height="48"
+                     data-src="img/penguin.png"
+                     alt="Down arrow">
+                <pre><code class="hljs bash" data-trim
+                                                  contenteditable>
                         (venv) $ pip install arcade
 					</code></pre>
-            <img width="48" height="48"
-                 data-src="img/windows_icon.png"
-                 alt="Down arrow">
-            <pre><code class="hljs cmd" data-trim contenteditable>
-                        (venv) C:\mygame> pip install arcade
-					</code></pre>
+
+            </div>
+            <div style="display: flex;">
+                <img width="48" height="48"
+                     data-src="img/windows_icon.png"
+                     alt="Down arrow">
+                <pre><code class="hljs cmd" data-trim contenteditable>
+                            (venv) C:\mygame> pip install arcade
+                        </code></pre>
+            </div>
         </section>
 
         <section>
@@ -252,18 +264,18 @@
             <pre><code class="hljs python" data-trim data-noescape
                        contenteditable>
                     >>> from pymunk.vec2d import Vec2d
-                    >>> v = Vec2d(3, 4)
-                    >>> v.x
+                    >>> pixel = Vec2d(3, 4)
+                    >>> pixel.x
                     3
-                    >>> v.y
+                    >>> pixel.y
                     4
                     >>>
-                    >>> v + 2 * v
+                    >>> pixel + 2 * pixel
                     Vec2d(9, 12)
-                    >>> v.length
+                    >>> pixel.length
                     5.0
-                    >>> v.length = 1
-                    >>> v
+                    >>> pixel.length = 1
+                    >>> pixel
                     Vec2d(0.6, 0.8)
             </code></pre>
         </section>
@@ -271,38 +283,36 @@
         <section>
             <h2>tip #2: saving and loading game data</h2>
             <p>Use the one in <b>pyglet</b>!</p>
-            <p>(pyglet gets installed when you install arcade)</p>
+            <p style="font-size: large">(pyglet gets installed when you install arcade)</p>
             <!--TODO: use pathlib-->
             <!--TODO: also "appdirs" package: https://pypi.org/project/appdirs/-->
-            <pre><code class="hljs python" data-trim data-noescape
-                       contenteditable>
-                import os
-                import pyglet.resource
+            <pre><code class="hljs python" data-trim data-noescape contenteditable>
+                import os, pyglet.resource, pathlib
 
-                dir = pyglet.resource.get_settings_path('MyGame')
-
-                if not os.path.exists(dir):
-                    os.makedirs(dir)
-
-                filename = os.path.join(dir, 'highscores.txt')
-                with open(filename, 'wt') as f:
-                    f.write(new_scores)
+                def save_scores(new_scores):
+                    path = pathlib.Path(
+                        pyglet.resource.get_settings_path("MyGame"),
+                        "highscores.txt"
+                    )
+                    path.mkdir(parents=True, exist_ok=True)
+                    with path.open("w") as f:
+                        f.write(new_scores)
             </code></pre>
         </section>
 
         <section>
             <p>Good discussion about lag compensation
 
-            https://www.reddit.com/r/Overwatch/comments/3u5kfg/everything_you_need_to_know_about_tick_rate/
-            https://en.wikipedia.org/wiki/Netcode
-            https://www.pcgamer.com/netcode-explained/
+                https://www.reddit.com/r/Overwatch/comments/3u5kfg/everything_you_need_to_know_about_tick_rate/
+                https://en.wikipedia.org/wiki/Netcode
+                https://www.pcgamer.com/netcode-explained/
 
-            Some python code here:
+                Some python code here:
 
-            https://www.gamedev.net/forums/topic/652377-network-tick-rates/
+                https://www.gamedev.net/forums/topic/652377-network-tick-rates/
 
-            Book on safari:
-            https://www.safaribooksonline.com/library/view/fundamentals-of-network/9781584505570/ch01.html
+                Book on safari:
+                https://www.safaribooksonline.com/library/view/fundamentals-of-network/9781584505570/ch01.html
             </p>
         </section>
     </div>
@@ -333,12 +343,12 @@
 <script>
     var btns = document.getElementsByClassName("runprogram");
     for (var i = 0; i < btns.length; i++) {
-        btns[i].addEventListener("click", function(event) {
+        btns[i].addEventListener("click", function (event) {
             var xhr = new XMLHttpRequest();
             xhr.open("POST", '/runprog', true);
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.onreadystatechange = function() {//Call a function when the state changes.
-                if(this.readyState == XMLHttpRequest.DONE && this.status == 200) {
+            xhr.onreadystatechange = function () {//Call a function when the state changes.
+                if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
                     // Request finished. Do processing here.
                     console.log('Done')
                 }
@@ -346,7 +356,7 @@
             // xhr.send("foo=bar&lorem=ipsum");
             var btn = event.target;
             var data = {};
-            for(var i = btn.attributes.length - 1; i >= 0; i--) {
+            for (var i = btn.attributes.length - 1; i >= 0; i--) {
                 data[btn.attributes[i].name] = btn.attributes[i].value
             }
             console.log(data);
