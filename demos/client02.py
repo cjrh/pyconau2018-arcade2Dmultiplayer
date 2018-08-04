@@ -51,6 +51,7 @@ class MyGame(arcade.Window):
     def __init__(self, width, height):
         super().__init__(width, height, title="Multiplayer Demo")
         self.keys_pressed = KeysPressed()
+        arcade.set_background_color(arcade.color.GRAY)
         self.player = Rectangle(
             0, 0, RECT_WIDTH, RECT_HEIGHT, 0, arcade.color.WHITE)
         self.player_event = PlayerEvent()
