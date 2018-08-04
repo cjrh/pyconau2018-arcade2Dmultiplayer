@@ -6,6 +6,7 @@ import zmq
 from zmq.asyncio import Context, Socket
 from pymunk.vec2d import Vec2d
 from .lib02 import PlayerEvent, PlayerState, GameState
+from .server_app import App
 from demos.movement import KeysPressed, apply_movement
 
 
@@ -38,11 +39,14 @@ def update_game_state(gs: GameState, event: PlayerEvent):
 
 
 async def update_from_client(gs: GameState, sock: Socket):
-    while True:
-        event_dict = await sock.recv_json()
-        print(f'Got event dict: {event_dict}')
-        event = PlayerEvent(**event_dict)
-        update_game_state(gs, event)
+    try:
+        while True:
+            event_dict = await sock.recv_json()
+            print(f'Got event dict: {event_dict}')
+            event = PlayerEvent(**event_dict)
+            update_game_state(gs, event)
+    except asyncio.CancelledError:
+        pass
 
 
 async def ticker(sock1, sock2):
@@ -52,16 +56,22 @@ async def ticker(sock1, sock2):
 
     # A task to receive keyboard and mouse inputs from players.
     # This will also update the game state, gs.
-    create_task(update_from_client(gs, sock2))
+    t = create_task(update_from_client(gs, sock2))
 
     # Send out the game state to all players 60 times per second.
-    while True:
-        await sock1.send_string(gs.to_json())
-        # print('.', end='', flush=True)
-        await asyncio.sleep(1 / SERVER_UPDATE_TICK_HZ)
+    try:
+        while True:
+            await sock1.send_string(gs.to_json())
+            # print('.', end='', flush=True)
+            await asyncio.sleep(1 / SERVER_UPDATE_TICK_HZ)
+    except asyncio.CancelledError:
+        t.cancel()
+        await t
 
 
 async def main():
+    fut = asyncio.Future()
+    app = App(signal=fut)
     ctx = Context()
 
     sock_push_gamestate: Socket = ctx.socket(zmq.PUB)
@@ -70,14 +80,22 @@ async def main():
     sock_recv_player_evts: Socket = ctx.socket(zmq.PULL)
     sock_recv_player_evts.bind('tcp://*:25001')
 
+    ticker_task = asyncio.create_task(
+        ticker(sock_push_gamestate, sock_recv_player_evts),
+    )
     try:
-        await ticker(sock_push_gamestate, sock_recv_player_evts)
+        await asyncio.wait(
+            [ticker_task, fut],
+            return_when=asyncio.FIRST_COMPLETED
+        )
     except CancelledError:
         print('Cancelled')
     finally:
+        ticker_task.cancel()
+        await ticker_task
         sock_push_gamestate.close(1)
         sock_recv_player_evts.close(1)
-        ctx.destroy(linger=1)
+        ctx.destroy(linger=1000)
 
 
 if __name__ == '__main__':

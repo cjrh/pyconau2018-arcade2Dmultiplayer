@@ -36,4 +36,5 @@ app.router.add_routes(routes)
 #     web.get('/', handle),
 # ])
 
+print('Serving on http://localhost:8080')
 web.run_app(app)
