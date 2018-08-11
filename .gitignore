@@ -102,3 +102,4 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+pyzmq-17.0.0-cp37-cp37m-win_amd64.whl
