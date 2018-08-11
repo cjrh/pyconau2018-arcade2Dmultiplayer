@@ -43,6 +43,25 @@
             border: none;
         }
 
+        .reveal {
+            font-family: "Liberation Sans", SansSerif;
+        }
+
+        .reveal code {
+            font-family: "Liga Cousine", "Liberation Mono", Monospaced;
+        }
+
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+            font-family: "Liberation Sans", SansSerif;
+        }
+
+        .reveal h1 {
+            font-size: 3em;
+        }
+
+        .reveal h2 {
+            font-size: 2em;
+        }
     </style>
 
     <!-- Printing and PDF exports -->
@@ -60,9 +79,14 @@
         <section>
             <h1>multiplayer 2D gaming</h1>
             <h2>with python-arcade</h2>
-            <h3>@caleb_hattingh</h3>
+            <h5>@caleb_hattingh</h5>
             <button class="runprogram" cmd="server02">server02</button>
             <button class="runprogram" cmd="client02">client02</button>
+        </section>
+
+        <section>
+            <h2>WARNING</h2>
+            <h3>(Screen flickering later)</h3>
         </section>
 
         <section>
@@ -79,8 +103,8 @@
                      height="250"
                      alt="Cover of 20 Python Libs book">
                 <div style="display: inline-block">
-                    <p style="margin: 0">
-                        April 2018</p>
+                    <p style="font-size: 0.6em; margin: 0">
+                        April 2018!</p>
                     <img src="/img/aiocover.png"
                          height="250"
                          alt="Cover of 20 Python Libs book"/>
@@ -326,6 +350,7 @@
     // - https://github.com/hakimel/reveal.js#configuration
     // - https://github.com/hakimel/reveal.js#dependencies
     Reveal.initialize({
+        transition: 'none',
         dependencies: [
             {src: 'plugin/markdown/marked.js'},
             {src: 'plugin/markdown/markdown.js'},

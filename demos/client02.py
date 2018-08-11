@@ -13,7 +13,6 @@ from pymunk.vec2d import Vec2d
 from demos.movement import KeysPressed, MOVE_MAP, apply_movement
 from .lib02 import PlayerEvent, PlayerState, GameState
 
-
 logger = logging.getLogger(__name__)
 logger.setLevel('INFO')
 SCREEN_WIDTH = 800
@@ -38,13 +37,22 @@ class Rectangle:
 
         # Color
         self.color = color
+        self.filled = True
 
     def draw(self):
-        arcade.draw_rectangle_filled(
-            self.position.x, self.position.y,
-            self.width, self.height,
-            self.color, self.angle
-        )
+        if self.filled:
+            arcade.draw_rectangle_filled(
+                self.position.x, self.position.y,
+                self.width, self.height,
+                self.color, self.angle
+            )
+        else:
+            arcade.draw_rectangle_outline(
+                self.position.x, self.position.y,
+                self.width, self.height,
+                self.color, border_width=2,
+                tilt_angle=self.angle
+            )
 
 
 class MyGame(arcade.Window):
@@ -54,6 +62,9 @@ class MyGame(arcade.Window):
         arcade.set_background_color(arcade.color.GRAY)
         self.player = Rectangle(
             0, 0, RECT_WIDTH, RECT_HEIGHT, 0, arcade.color.WHITE)
+        self.player.filled = False
+        self.ghost = Rectangle(
+            0, 0, RECT_WIDTH, RECT_HEIGHT, 0, arcade.color.BLACK)
         self.player_event = PlayerEvent()
         self.game_state = GameState(
             player_states=[
@@ -68,6 +79,7 @@ class MyGame(arcade.Window):
         x = SCREEN_WIDTH // 2
         y = SCREEN_HEIGHT // 2
         self.player.position += Vec2d(x, y)
+        self.ghost.position += Vec2d(x, y)
 
     def lerp(self, v0: float, v1: float, t: float):
         if t > 1:
@@ -77,36 +89,49 @@ class MyGame(arcade.Window):
     def update(self, dt):
         # Calculate position using only local information (nothing from server)
         speed = 300
-        local_position = apply_movement(speed, dt, self.player.position, self.keys_pressed)
+        local_position = apply_movement(speed, dt, self.player.position,
+                                        self.keys_pressed)
 
         # Now calculate the new position based on the server information
         if len(self.position_buffer) < 2:
             return
 
-        v0, t0 = self.position_buffer[0]
-        v1, t1 = self.position_buffer[1]
+        # These are the last two positions. p1 is the latest, p0 is the
+        # one immediately preceding it.
+        p0, t0 = self.position_buffer[0]
+        p1, t1 = self.position_buffer[1]
+
+        dtt = t1 - t0
+        if dtt == 0:
+            return
+
+        # Calculate a PREDICTED future position, based on these two.
+        velocity = (p1 - p0) / dtt
+
+        # predicted position
+        pp = velocity * dtt + p1
 
         # Now we're here: how to draw the new position in such a way that
         # looks completely smooth but also accurately reflects where the
         # SERVER thinks we are?
-        if t0 == t1:
-            return
 
-        x = (self.t - t0) / (t1 - t0)
+        x = (self.t - t1) / dtt
         netcode_position = self.lerp(
-            self.player.position, v1, x
+            self.player.position, p1, x
         )
 
         interp_position = self.lerp(
-            local_position, v1, x
+            local_position, pp, x
         )
 
         self.player.position = interp_position
+        # self.player.position = p1
+        self.ghost.position = p1
 
         # # So here we have the netcode position, and the local position.
         # # Let's interpolate between them!
         # ratio = 0.5
-        # netcode_position = v1
+        # netcode_position = p1
         # self.player.position = (
         #         netcode_position * ratio
         #         + local_position * (1 - ratio)
@@ -116,6 +141,7 @@ class MyGame(arcade.Window):
 
     def on_draw(self):
         arcade.start_render()
+        self.ghost.draw()
         self.player.draw()
 
     def on_key_press(self, key, modifiers):
