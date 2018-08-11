@@ -76,7 +76,7 @@ class MyGame(arcade.Window):
 
     def update(self, dt):
         # Calculate position using only local information (nothing from server)
-        speed = 500 - 10
+        speed = 300
         local_position = apply_movement(speed, dt, self.player.position, self.keys_pressed)
 
         # Now calculate the new position based on the server information
@@ -144,8 +144,8 @@ async def thread_main(window: MyGame, loop):
         """Push the player's INPUT state 60 times per second"""
         while True:
             d = window.player_event.asdict()
-            # logger.debug(d)
-            await push_sock.send_json(d)
+            msg = dict(counter=1, event=d)
+            await push_sock.send_json(msg)
             await asyncio.sleep(1 / UPDATE_TICK)
 
     async def receive_game_state():

@@ -15,7 +15,7 @@ SERVER_UPDATE_TICK_HZ = 10
 
 def update_game_state(gs: GameState, event: PlayerEvent):
     player_state = gs.player_states[0]
-    dt = time.time() - (player_state.updated - 50e-3)
+    dt = time.time() - (player_state.updated)
     current_position = Vec2d(player_state.x, player_state.y)
     current_position = apply_movement(
         player_state.speed, dt, current_position, event
@@ -41,7 +41,10 @@ def update_game_state(gs: GameState, event: PlayerEvent):
 async def update_from_client(gs: GameState, sock: Socket):
     try:
         while True:
-            event_dict = await sock.recv_json()
+            msg = await sock.recv_json()
+            counter = msg['counter']
+            event_dict = msg['event']
+            # event_dict = await sock.recv_json()
             print(f'Got event dict: {event_dict}')
             event = PlayerEvent(**event_dict)
             update_game_state(gs, event)
