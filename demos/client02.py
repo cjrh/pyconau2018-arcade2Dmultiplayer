@@ -109,7 +109,7 @@ class MyGame(arcade.Window):
         velocity = (p1 - p0) / dtt
 
         # predicted position
-        pp = velocity * dtt + p1
+        predicted_position = velocity * dtt + p1
 
         # Now we're here: how to draw the new position in such a way that
         # looks completely smooth but also accurately reflects where the
@@ -121,7 +121,7 @@ class MyGame(arcade.Window):
         )
 
         interp_position = self.lerp(
-            local_position, pp, x
+            local_position, predicted_position, x
         )
 
         self.player.position = interp_position

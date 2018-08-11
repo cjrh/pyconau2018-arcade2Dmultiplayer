@@ -90,6 +90,50 @@
         </section>
 
         <section>
+            <h3>Client-side Interpolation</h3>
+            <p>Need to understand <u>motion</u>, i.e., speed</p>
+            <script type="math/tex; mode=display">
+                v_x = \frac{x_1 - x_0}{t_1 - t_0} \qquad v_y = \frac{y_1 - y_0}{t_1 - t_0}
+            </script>
+            <p class="fragment">This describes the past—what about the future?</p>
+            <div class="fragment">
+                <script class="fragment" type="math/tex; mode=display">
+                v_x = \frac{\color{red}{x_2} - x_1}
+                {\color{red}{t_2} - t_1} \qquad v_y =
+                \frac{\color{red}{y_2} - y_1}{\color{red}{t_2} - t_1}
+            </script>
+
+            </div>
+        </section>
+
+        <section>
+            <h3>Client-side Interpolation</h3>
+            <script type="math/tex; mode=display">
+                v_x = \frac{\color{red}{x_2} - x_1}
+                {\color{red}{t_2} - t_1} \qquad v_y =
+                \frac{\color{red}{y_2} - y_1}{\color{red}{t_2} - t_1}
+            </script>
+
+            <p class="fragment">Make the predicted values explicit:</p>
+
+            <div class="fragment">
+                <script class="fragment" type="math/tex; mode=display">
+                    \color{red}{x_2} = v_x \times \Delta t + x_1
+                    \qquad
+                    \color{red}{y_2} = v_y \times \Delta t + y_1
+                </script>
+            </div>
+        </section>
+
+        <section>
+            <h3>The Cauchy-Schwarz Inequality</h3>
+
+            <script type="math/tex; mode=display">
+                \left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)
+            </script>
+        </section>
+
+        <section>
             <h2>about me</h2>
             <ul>
                 <li>Current: SSE team lead at PCCW Global</li>
@@ -351,8 +395,13 @@
     // - https://github.com/hakimel/reveal.js#dependencies
     Reveal.initialize({
         transition: 'none',
+        math: {
+            mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+            config: 'TeX-AMS_HTML-full'  // See http://docs.mathjax.org/en/latest/config-files.html
+        },
         dependencies: [
             {src: 'plugin/markdown/marked.js'},
+            {src: 'plugin/math/math.js', async: true},
             {src: 'plugin/markdown/markdown.js'},
             {src: 'plugin/notes/notes.js', async: true},
             {
