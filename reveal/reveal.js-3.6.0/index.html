@@ -56,11 +56,11 @@
         }
 
         .reveal h1 {
-            font-size: 3em;
+            font-size: 2.6em;
         }
 
         .reveal h2 {
-            font-size: 2em;
+            font-size: 1.8em;
         }
     </style>
 
@@ -139,34 +139,17 @@
         </section>
 
         <section>
-            <h2><u>lots</u> of examples</h2>
+            <h2>Why Arcade?</h2>
             <ul>
-                <li>
-                    <pre><code class="hljs bash" data-trim data-noescape
-                               contenteditable>
-                        (venv) $ python -m arcade.examples.<mark>bouncing_ball</mark>
-					</code></pre>
-                </li>
-                <li>
-                    <pre><code class="hljs bash" data-trim data-noescape
-                               contenteditable>
-                        (venv) $ python -m arcade.examples.<mark>drawing_text</mark>
-					</code></pre>
-                </li>
-                <li>
-                    <pre><code class="hljs bash" data-trim data-noescape
-                               contenteditable>
-                        (venv) $ python -m arcade.examples.<mark>full_screen_example</mark>
-					</code></pre>
-                </li>
-                <li>
-                    <pre><code class="hljs bash" data-trim data-noescape
-                               contenteditable>
-                        (venv) $ python -m arcade.examples.<mark>sprite_move_keyboard</mark>
-					</code></pre>
-                </li>
+                <li>Easy to install</li>
+                <li>Built on OpenGL (via Pyglet)</li>
+                <li>Modern (Python 3 only, type annotations)</li>
+                <li><code>(0, 0)</code> is at the bottom left</li>
+                <li>Very clean, simple API</li>
+                <li class="fragment"><strong>Examples </strong>🎁🎁🎁</li>
             </ul>
         </section>
+
 
         <section>
             <h2><u>lots</u> of examples</h2>
@@ -273,6 +256,37 @@
         </section>
 
         <section>
+            <h2>lots of examples</h2>
+            <ul>
+                <li>
+                    <pre><code class="hljs bash" data-trim data-noescape
+                               contenteditable>
+                        (venv) $ python -m arcade.examples.<mark>bouncing_ball</mark>
+					</code></pre>
+                </li>
+                <li>
+                    <pre><code class="hljs bash" data-trim data-noescape
+                               contenteditable>
+                        (venv) $ python -m arcade.examples.<mark>drawing_text</mark>
+					</code></pre>
+                </li>
+                <li>
+                    <pre><code class="hljs bash" data-trim data-noescape
+                               contenteditable>
+                        (venv) $ python -m arcade.examples.<mark>full_screen_example</mark>
+					</code></pre>
+                </li>
+                <li>
+                    <pre><code class="hljs bash" data-trim data-noescape
+                               contenteditable>
+                        (venv) $ python -m arcade.examples.<mark>sprite_move_keyboard</mark>
+					</code></pre>
+                </li>
+            </ul>
+        </section>
+
+
+        <section>
             <h2>step back: the big picture</h2>
             <p>picture of server and networked PCs</p>
         </section>
@@ -314,10 +328,8 @@
                 import os, pyglet.resource, pathlib
 
                 def save_scores(new_scores):
-                    path = pathlib.Path(
-                        pyglet.resource.get_settings_path("MyGame"),
-                        "highscores.txt"
-                    )
+                    game_folder = pyglet.resource.get_settings_path("MyGame")
+                    path = pathlib.Path(game_folder, "highscores.txt")
                     path.mkdir(parents=True, exist_ok=True)
                     with path.open("w") as f:
                         f.write(new_scores)
@@ -337,6 +349,42 @@
 
                 Book on safari:
                 https://www.safaribooksonline.com/library/view/fundamentals-of-network/9781584505570/ch01.html
+            </p>
+        </section>
+
+        <section>
+            <h3>Network Models</h3>
+            <ol>
+                <li>Peer-to-peer: clients calculate themselves
+                    <ul style="font-size: smaller">
+                        <li>Examples: Awesomenauts</li>
+                    </ul>
+                </li>
+                <li class="fragment">Peer-to-peer (lockstep): each client calculates <em>everything</em>
+                    <ul style="font-size: smaller">
+                        <li>Examples: Command &amp; Conquer, Age of Empires, Starcraft,
+                        Supreme Commander 2</li>
+                    </ul>
+                </li>
+                <li class="fragment">Client-server: only server calculates
+                    <ul style="font-size: smaller">
+                        <li>Examples: Doom, Quake, Unreal Tournament, Overwatch</li>
+                    </ul>
+                </li>
+            </ol>
+            <p style="font-size: 0.6em;">References:
+                <br>
+                <a style="font-size: 0.6em" href="https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/">
+                What every programmer needs to know about game networking - Glenn Fiedler
+                </a>
+                <br>
+                <a style="font-size: 0.6em" href="http://joostdevblog.blogspot.com/2014/09/core-network-structures-for-games.html">
+                Core network structures for games - Joost van Dongen
+                </a>
+                <br>
+                <a style="font-size: 0.6em" href="https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking">
+                    Source Multiplayer Networking - Valve
+                </a>
             </p>
         </section>
 
