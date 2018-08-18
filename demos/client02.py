@@ -87,8 +87,10 @@ class MyGame(arcade.Window):
         return (1 - t) * v0 + t * v1
 
     def update(self, dt):
-        # Calculate position using only local information (nothing from server)
-        speed = 300
+        # Calculate position using only local information, nothing
+        # from server. This is the position we would achieve if
+        # everything was calculated locally.
+        speed = 50
         local_position = apply_movement(speed, dt, self.player.position,
                                         self.keys_pressed)
 
@@ -121,8 +123,9 @@ class MyGame(arcade.Window):
         )
 
         interp_position = self.lerp(
-            local_position, predicted_position, x
+            p1, predicted_position, x
         )
+        print(p0, p1, predicted_position, interp_position)
 
         self.player.position = interp_position
         # self.player.position = p1
@@ -184,7 +187,7 @@ async def thread_main(window: MyGame, loop):
             window.position_buffer.append(
                 (Vec2d(ps.x, ps.y), t)
             )
-            window.t = window.position_buffer[0][1]
+            window.t = window.position_buffer[-1][1]
 
     try:
         await asyncio.gather(pusher(), receive_game_state())

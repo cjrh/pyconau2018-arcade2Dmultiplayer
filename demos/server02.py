@@ -10,7 +10,7 @@ from .server_app import App
 from demos.movement import KeysPressed, apply_movement
 
 
-SERVER_UPDATE_TICK_HZ = 2
+SERVER_UPDATE_TICK_HZ = 4
 
 
 def update_game_state(gs: GameState, event: PlayerEvent):
@@ -53,7 +53,7 @@ async def update_from_client(gs: GameState, sock: Socket):
 
 
 async def ticker(sock1, sock2):
-    ps = PlayerState(speed=50)
+    ps = PlayerState(speed=150)
     gs = GameState(player_states=[ps], game_seconds=1)
     s = gs.to_json()
 
