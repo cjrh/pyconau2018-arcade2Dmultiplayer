@@ -1,12 +1,16 @@
+import sys
 from aiohttp import web
 import subprocess as sp
 
 routes = web.RouteTableDef()
 
+FILENAME = 'reveal/reveal.js-3.6.0/index.html'
+if len(sys.argv) > 1:
+    FILENAME = f'reveal/reveal.js-3.6.0/{sys.argv[1]}'
 
 @routes.get('/')
 async def handle(request):
-    return web.FileResponse('reveal/reveal.js-3.6.0/index.html')
+    return web.FileResponse(FILENAME)
 
 
 @routes.post('/runprog')

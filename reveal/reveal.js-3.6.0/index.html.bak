@@ -22,8 +22,8 @@
         }
 
         .reveal mark {
-            color: #080e1b;
-            background-color: #fff400;
+            color: whitesmoke;
+            background-color: #080e1b;
         }
 
         .container {

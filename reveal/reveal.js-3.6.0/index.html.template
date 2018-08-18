@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>reveal.js</title>
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/white.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/github.css">
+
+    <style>
+        .reveal {
+            font-size: 36px;
+        }
+        .reveal pre {
+            width: unset;
+        }
+
+        .reveal mark {
+            color: #080e1b;
+            background-color: #fff400;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .reveal div.container p {
+            margin: 0;
+        }
+
+        .reveal section img {
+            border: none;
+        }
+
+        .reveal {
+            font-family: "Liberation Sans", SansSerif;
+        }
+
+        .reveal code {
+            font-family: "Liga Cousine", "Liberation Mono", Monospaced;
+        }
+
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+            font-family: "Liberation Sans", SansSerif;
+        }
+
+        .reveal h1 {
+            font-size: 2.6em;
+        }
+
+        .reveal h2 {
+            font-size: 1.8em;
+        }
+    </style>
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+        $slides
+    </div>
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.js"></script>
+
+<script>
+    // More info about config & dependencies:
+    // - https://github.com/hakimel/reveal.js#configuration
+    // - https://github.com/hakimel/reveal.js#dependencies
+    Reveal.initialize({
+        transition: 'none',
+        math: {
+            mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+            config: 'TeX-AMS_HTML-full'  // See http://docs.mathjax.org/en/latest/config-files.html
+        },
+        dependencies: [
+            {src: 'plugin/markdown/marked.js'},
+            {src: 'plugin/math/math.js', async: true},
+            {src: 'plugin/markdown/markdown.js'},
+            {src: 'plugin/notes/notes.js', async: true},
+            {
+                src: 'plugin/highlight/highlight.js',
+                async: true,
+                callback: function () {
+                    hljs.initHighlightingOnLoad();
+                }
+            }
+        ]
+    });
+</script>
+<script>
+    var btns = document.getElementsByClassName("runprogram");
+    for (var i = 0; i < btns.length; i++) {
+        btns[i].addEventListener("click", function (event) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", '/runprog', true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function () {//Call a function when the state changes.
+                if (this.readyState == XMLHttpRequest.DONE && this.status == 200) {
+                    // Request finished. Do processing here.
+                    console.log('Done')
+                }
+            };
+            // xhr.send("foo=bar&lorem=ipsum");
+            var btn = event.target;
+            var data = {};
+            for (var i = btn.attributes.length - 1; i >= 0; i--) {
+                data[btn.attributes[i].name] = btn.attributes[i].value
+            }
+            console.log(data);
+            xhr.send(JSON.stringify(data));
+        })
+    }
+    // document.getElementById("b1").addEventListener("click", function(event) {
+    //     var xhr = new XMLHttpRequest();
+    //     xhr.open("POST", '/runprog', true);
+    //     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    //     xhr.onreadystatechange = function() {//Call a function when the state changes.
+    //         if(this.readyState == XMLHttpRequest.DONE && this.status == 200) {
+    //             // Request finished. Do processing here.
+    //             console.log('Done')
+    //         }
+    //     };
+    //     // xhr.send("foo=bar&lorem=ipsum");
+    //     var data = {};
+    //     for(var i = this.attributes.length - 1; i >= 0; i--) {
+    //         data[this.attributes[i].name] = this.attributes[i].value
+    //     }
+    //     console.log(data);
+    //     xhr.send(JSON.stringify(data));
+    // })
+</script>
+</body>
+</html>
