@@ -62,6 +62,7 @@ class MyGame(arcade.Window):
         arcade.set_background_color(arcade.color.GRAY)
         self.player = Rectangle(
             0, 0, RECT_WIDTH, RECT_HEIGHT, 0, arcade.color.WHITE)
+        self.player_position_snapshot = copy.copy(self.player.position)
         self.player.filled = False
         self.ghost = Rectangle(
             0, 0, RECT_WIDTH, RECT_HEIGHT, 0, arcade.color.BLACK)
@@ -117,15 +118,17 @@ class MyGame(arcade.Window):
         # looks completely smooth but also accurately reflects where the
         # SERVER thinks we are?
 
-        x = (self.t - t1) / dtt
+        # x = (self.t - t1) / dtt
+        x = (self.t - 0) / dtt
         netcode_position = self.lerp(
             self.player.position, p1, x
         )
 
         interp_position = self.lerp(
-            p1, predicted_position, x
+            # p1, predicted_position, x
+            self.player_position_snapshot, predicted_position, x
         )
-        print(p0, p1, predicted_position, interp_position)
+        print(x, p0, p1, predicted_position, self.player_position_snapshot, interp_position)
 
         self.player.position = interp_position
         # self.player.position = p1
@@ -187,7 +190,8 @@ async def thread_main(window: MyGame, loop):
             window.position_buffer.append(
                 (Vec2d(ps.x, ps.y), t)
             )
-            window.t = window.position_buffer[-1][1]
+            window.t = 0
+            window.player_position_snapshot = window.player.position * 1
 
     try:
         await asyncio.gather(pusher(), receive_game_state())
