@@ -10,7 +10,7 @@ from .server_app import App
 from demos.movement import KeysPressed, apply_movement
 
 
-SERVER_UPDATE_TICK_HZ = 4
+SERVER_UPDATE_TICK_HZ = 3
 
 
 def update_game_state(gs: GameState, event: PlayerEvent):
@@ -47,7 +47,13 @@ async def update_from_client(gs: GameState, sock: Socket):
             # event_dict = await sock.recv_json()
             print(f'Got event dict: {event_dict}')
             event = PlayerEvent(**event_dict)
-            update_game_state(gs, event)
+            if 0:
+                # impose fake latency
+                asyncio.get_running_loop().call_later(
+                    0.2, update_game_state, gs, event
+                )
+            else:
+                update_game_state(gs, event)
     except asyncio.CancelledError:
         pass
 

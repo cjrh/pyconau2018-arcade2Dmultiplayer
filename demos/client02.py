@@ -50,7 +50,7 @@ class Rectangle:
             arcade.draw_rectangle_outline(
                 self.position.x, self.position.y,
                 self.width, self.height,
-                self.color, border_width=2,
+                self.color, border_width=4,
                 tilt_angle=self.angle
             )
 
@@ -61,7 +61,7 @@ class MyGame(arcade.Window):
         self.keys_pressed = KeysPressed()
         arcade.set_background_color(arcade.color.GRAY)
         self.player = Rectangle(
-            0, 0, RECT_WIDTH, RECT_HEIGHT, 0, arcade.color.WHITE)
+            0, 0, RECT_WIDTH, RECT_HEIGHT, 0, arcade.color.GREEN_YELLOW)
         self.player_position_snapshot = copy.copy(self.player.position)
         self.player.filled = False
         self.ghost = Rectangle(
@@ -83,15 +83,14 @@ class MyGame(arcade.Window):
         self.ghost.position += Vec2d(x, y)
 
     def lerp(self, v0: float, v1: float, t: float):
-        if t > 1:
-            t = 1
+        """ L-inear int-ERP-olation"""
         return (1 - t) * v0 + t * v1
 
     def update(self, dt):
         # Calculate position using only local information, nothing
         # from server. This is the position we would achieve if
         # everything was calculated locally.
-        speed = 50
+        speed = 150
         local_position = apply_movement(speed, dt, self.player.position,
                                         self.keys_pressed)
 
@@ -114,12 +113,25 @@ class MyGame(arcade.Window):
         # predicted position
         predicted_position = velocity * dtt + p1
 
+        # This will always be the same until we receive a new snapshot
+        local_position = apply_movement(
+            speed, dtt, self.player_position_snapshot, self.keys_pressed
+        )
+
+
         # Now we're here: how to draw the new position in such a way that
         # looks completely smooth but also accurately reflects where the
         # SERVER thinks we are?
 
         # x = (self.t - t1) / dtt
         x = (self.t - 0) / dtt
+        x = min(x, 1)
+
+        predicted_position = (
+            x * predicted_position
+            + (1 - x) * local_position
+        )
+
         netcode_position = self.lerp(
             self.player.position, p1, x
         )
@@ -128,7 +140,7 @@ class MyGame(arcade.Window):
             # p1, predicted_position, x
             self.player_position_snapshot, predicted_position, x
         )
-        print(x, p0, p1, predicted_position, self.player_position_snapshot, interp_position)
+        # print(x, p0, p1, predicted_position, self.player_position_snapshot, interp_position)
 
         self.player.position = interp_position
         # self.player.position = p1
