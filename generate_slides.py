@@ -20,10 +20,13 @@ def main():
         slide_title(),
         slide_warning_flickering(),
         slide_about_me(),
+
         slide_python_arcade(),
+        slide_arcade_docs(),
         slide_why_arcade(),
         slide_lots_of_examples(),
         slide_run_examples(),
+
         slide_big_picture(),
         slide_getting_started(),
         slide_strategy(),
@@ -68,7 +71,9 @@ def main():
 def slide_title():
     h1('multiplayer 2D gaming')
     h2('with python-arcade')
-    h5('@caleb_hattingh')
+    with p(style='font-size: 0.8em'):
+        text('@caleb_hattingh ● ')
+        a('github.com/cjrh', href='github.com/cjrh')
     button('server02', cls='runprogram', cmd='server02')
     button('client02', cls='runprogram', cmd='client02')
 
@@ -120,10 +125,14 @@ def slide_python_arcade():
                     (venv) C:\mygame> pip install arcade
                 ''')
 
+@section
+def slide_arcade_docs():
+    img(src='/img/arcade_doc_screenshot.png')
+
 
 @section
 def slide_why_arcade():
-    h2('Why Arcade?')
+    h2('Why Python-Arcade?')
     with ul():
         li('Easy to install')
         li('OpenGL (via Pyglet)')
@@ -188,10 +197,16 @@ def slide_big_picture():
     p('picture of server and networked pcs')
 
 
-@section
+@section(style='top: 50px')
 def slide_getting_started():
-    h2('Getting started with Arcade')
-    p('basic description of a hello world')
+    h2('Getting started')
+    code_path = pathlib.Path('demos') / 'getting_started.py'
+    with pre(style='font-size: 0.4em'):
+        with code(cls='hljs python', data_trim='true', contenteditable='true',
+                  style='max-height: unset'):
+            with open(code_path) as f:
+                text(f.read())
+    button('getting_started.py', cls='runprogram', cmd='getting_started')
 
 
 # Here we should sketch out a basic attack strategy
@@ -199,7 +214,7 @@ def slide_getting_started():
 
 @section
 def slide_strategy():
-    h2('Sequence of events')
+    h2('Components')
 
     def lip(text=None):
         if text:
@@ -215,7 +230,7 @@ def slide_strategy():
                 with lip():
                     strong('Loop A: ')
                     text('send player input (keyboard, mouse) '
-                         'e.g. 60 Hz')
+                         'e.g. 30 Hz')
                 with lip():
                     strong('Loop B: ')
                     text('receive game state (position, health) '
@@ -232,13 +247,14 @@ def slide_strategy():
                 with lip():
                     strong('Loop B: ')
                     with ol():
-                        li('receives player input')
-                        li('updates game state')
+                        li('receive player input')
+                        li('update game state')
                 with lip():
                     strong('Loop C: ')
                     text('send game state to clients, e.g. 60 Hz')
 
-    p('Each of the internal loops runs independently.')
+    p('Each of the internal loops runs independently.',
+      cls='fragment')
 
 
 @section

@@ -78,7 +78,9 @@
         <section>
   <h1>multiplayer 2D gaming</h1>
   <h2>with python-arcade</h2>
-  <h5>@caleb_hattingh</h5>
+  <p style="font-size: 0.8em">@caleb_hattingh ● 
+    <a href="github.com/cjrh">github.com/cjrh</a>
+  </p>
   <button class="runprogram" cmd="server02">server02</button>
   <button class="runprogram" cmd="client02">client02</button>
 </section>
@@ -122,7 +124,10 @@
   </div>
 </section>
 <section>
-  <h2>Why Arcade?</h2>
+  <img src="/img/arcade_doc_screenshot.png">
+</section>
+<section>
+  <h2>Why Python-Arcade?</h2>
   <ul>
     <li>Easy to install</li>
     <li>OpenGL (via Pyglet)</li>
@@ -261,19 +266,49 @@
   <h2>The Big Picture</h2>
   <p>picture of server and networked pcs</p>
 </section>
-<section>
-  <h2>Getting started with Arcade</h2>
-  <p>basic description of a hello world</p>
+<section style="top: 50px">
+  <h2>Getting started</h2>
+  <pre style="font-size: 0.4em"><code class="hljs python" contenteditable="true" data-trim="true" style="max-height: unset">import arcade
+from pymunk.vec2d import Vec2d
+from demos.movement import KeysPressed, MOVE_MAP, apply_movement
+
+class MyGame(arcade.Window):
+    def __init__(self, width, height):
+        super().__init__(width, height, title=&quot;Getting Started&quot;)
+        self.player_position = Vec2d(400, 300)
+        self.keys_pressed = KeysPressed()
+
+    def update(self, dt):
+        self.player_position = apply_movement(
+            speed=600, dt=dt, current_position=self.player_position, kp=self.keys_pressed)
+
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_rectangle_filled(
+            center_x=self.player_position.x, center_y=self.player_position.y,
+            width=50, height=50, color=arcade.color.GREEN_YELLOW, tilt_angle=0)
+
+    def on_key_press(self, key, modifiers):
+        self.keys_pressed.keys[key] = True
+
+    def on_key_release(self, key, modifiers):
+        self.keys_pressed.keys[key] = False
+
+if __name__ == &quot;__main__&quot;:
+    window = MyGame(800, 600)
+    arcade.run()
+</code></pre>
+  <button class="runprogram" cmd="getting_started">getting_started.py</button>
 </section>
 <section>
-  <h2>Sequence of events</h2>
+  <h2>Components</h2>
   <div class="container">
     <div class="col" style="padding: 10px">
       <h3>Client</h3>
       <ol>
         <li class="fragment" style="font-size: 0.7em">client connects to server</li>
         <li class="fragment" style="font-size: 0.7em">
-          <strong>Loop A: </strong>send player input (keyboard, mouse) e.g. 60 Hz
+          <strong>Loop A: </strong>send player input (keyboard, mouse) e.g. 30 Hz
         </li>
         <li class="fragment" style="font-size: 0.7em">
           <strong>Loop B: </strong>receive game state (position, health) from server
@@ -292,8 +327,8 @@
         <li class="fragment" style="font-size: 0.7em">
           <strong>Loop B: </strong>
           <ol>
-            <li>receives player input</li>
-            <li>updates game state</li>
+            <li>receive player input</li>
+            <li>update game state</li>
           </ol>
         </li>
         <li class="fragment" style="font-size: 0.7em">
@@ -302,7 +337,7 @@
       </ol>
     </div>
   </div>
-  <p>Each of the internal loops runs independently.</p>
+  <p class="fragment">Each of the internal loops runs independently.</p>
 </section>
 <section>
   <h2>🎁tip #1: use a vector class</h2>
