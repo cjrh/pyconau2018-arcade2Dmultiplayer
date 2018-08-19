@@ -22,7 +22,7 @@ RECT_WIDTH = 50
 RECT_HEIGHT = 50
 
 MOVEMENT_SPEED = 5
-UPDATE_TICK = 15
+UPDATE_TICK = 30
 
 
 class Rectangle:
@@ -87,13 +87,6 @@ class MyGame(arcade.Window):
         return (1 - t) * v0 + t * v1
 
     def update(self, dt):
-        # Calculate position using only local information, nothing
-        # from server. This is the position we would achieve if
-        # everything was calculated locally.
-        speed = 150
-        local_position = apply_movement(speed, dt, self.player.position,
-                                        self.keys_pressed)
-
         # Now calculate the new position based on the server information
         if len(self.position_buffer) < 2:
             return
@@ -113,47 +106,15 @@ class MyGame(arcade.Window):
         # predicted position
         predicted_position = velocity * dtt + p1
 
-        # This will always be the same until we receive a new snapshot
-        local_position = apply_movement(
-            speed, dtt, self.player_position_snapshot, self.keys_pressed
-        )
-
-
-        # Now we're here: how to draw the new position in such a way that
-        # looks completely smooth but also accurately reflects where the
-        # SERVER thinks we are?
-
-        # x = (self.t - t1) / dtt
         x = (self.t - 0) / dtt
         x = min(x, 1)
-
-        predicted_position = (
-            x * predicted_position
-            + (1 - x) * local_position
-        )
-
-        netcode_position = self.lerp(
-            self.player.position, p1, x
-        )
-
         interp_position = self.lerp(
-            # p1, predicted_position, x
             self.player_position_snapshot, predicted_position, x
         )
-        # print(x, p0, p1, predicted_position, self.player_position_snapshot, interp_position)
 
         self.player.position = interp_position
         # self.player.position = p1
         self.ghost.position = p1
-
-        # # So here we have the netcode position, and the local position.
-        # # Let's interpolate between them!
-        # ratio = 0.5
-        # netcode_position = p1
-        # self.player.position = (
-        #         netcode_position * ratio
-        #         + local_position * (1 - ratio)
-        # )
 
         self.t += dt
 
