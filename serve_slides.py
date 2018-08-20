@@ -20,7 +20,7 @@ async def runprog(request):
     if 'cmd' in data:
         fname = data['cmd']
         sp.Popen(
-            f'python -m demos.{fname}'.split(),
+            f'python -m {fname}'.split(),
         )
 
     return web.Response()

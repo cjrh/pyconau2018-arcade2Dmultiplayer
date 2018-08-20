@@ -10,7 +10,7 @@ from .server_app import App
 from demos.movement import KeysPressed, apply_movement
 
 
-SERVER_UPDATE_TICK_HZ = 60
+SERVER_UPDATE_TICK_HZ = 10
 
 
 def update_game_state(gs: GameState, event: PlayerEvent):

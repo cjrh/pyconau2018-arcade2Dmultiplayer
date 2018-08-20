@@ -61,6 +61,30 @@
         .reveal h2 {
             font-size: 1.8em;
         }
+
+        .hljs {
+            color: black;
+        }
+
+        button.runprogram {
+            font-family: "Liberation Sans", SansSerif;
+            color: #000000 !important;
+            text-transform: uppercase;
+            background: #9c9c9c;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            border: none;
+        }
+
+        button.runprogram:hover {
+            background: #00c2ea;
+            letter-spacing: 1px;
+            -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+            -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+            box-shadow: 5px 40px -10px rgba(0,0,0,0.57);
+            transition: all 0.4s ease 0s;
+        }
     </style>
 
     <!-- Printing and PDF exports -->
@@ -81,12 +105,8 @@
   <p style="font-size: 0.8em">@caleb_hattingh ● 
     <a href="github.com/cjrh">github.com/cjrh</a>
   </p>
-  <button class="runprogram" cmd="server02">server02</button>
-  <button class="runprogram" cmd="client02">client02</button>
-</section>
-<section>
-  <h2>WARNING</h2>
-  <h3>Screen flickering later</h3>
+  <button class="runprogram" cmd="demos.server02">server02</button>
+  <button class="runprogram" cmd="demos.client02">client02</button>
 </section>
 <section>
   <h2>about me</h2>
@@ -250,94 +270,25 @@
   <ul>
     <li>
       <pre><code class="hljs bash" contenteditable="true" data-noescape="true" data-trim="true">(venv) $ python -m arcade.examples.<mark>bouncing_ball</mark></code></pre>
+      <button class="runprogram" cmd="arcade.examples.bouncing_ball">bouncing_ball</button>
     </li>
     <li>
       <pre><code class="hljs bash" contenteditable="true" data-noescape="true" data-trim="true">(venv) $ python -m arcade.examples.<mark>drawing_text</mark></code></pre>
+      <button class="runprogram" cmd="arcade.examples.drawing_text">drawing_text</button>
     </li>
     <li>
       <pre><code class="hljs bash" contenteditable="true" data-noescape="true" data-trim="true">(venv) $ python -m arcade.examples.<mark>full_screen_example</mark></code></pre>
+      <button class="runprogram" cmd="arcade.examples.full_screen_example">full_screen_example</button>
     </li>
     <li>
       <pre><code class="hljs bash" contenteditable="true" data-noescape="true" data-trim="true">(venv) $ python -m arcade.examples.<mark>sprite_move_keyboard</mark></code></pre>
+      <button class="runprogram" cmd="arcade.examples.sprite_move_keyboard">sprite_move_keyboard</button>
     </li>
   </ul>
 </section>
 <section>
   <h2>The Big Picture</h2>
   <p>picture of server and networked pcs</p>
-</section>
-<section style="top: 50px">
-  <h2>Getting started</h2>
-  <pre style="font-size: 0.4em"><code class="hljs python" contenteditable="true" data-trim="true" style="max-height: unset">import arcade
-from pymunk.vec2d import Vec2d
-from demos.movement import KeysPressed, MOVE_MAP, apply_movement
-
-class MyGame(arcade.Window):
-    def __init__(self, width, height):
-        super().__init__(width, height, title=&quot;Getting Started&quot;)
-        self.player_position = Vec2d(400, 300)
-        self.keys_pressed = KeysPressed()
-
-    def update(self, dt):
-        self.player_position = apply_movement(
-            speed=600, dt=dt, current_position=self.player_position, kp=self.keys_pressed)
-
-    def on_draw(self):
-        arcade.start_render()
-        arcade.draw_rectangle_filled(
-            center_x=self.player_position.x, center_y=self.player_position.y,
-            width=50, height=50, color=arcade.color.GREEN_YELLOW, tilt_angle=0)
-
-    def on_key_press(self, key, modifiers):
-        self.keys_pressed.keys[key] = True
-
-    def on_key_release(self, key, modifiers):
-        self.keys_pressed.keys[key] = False
-
-if __name__ == &quot;__main__&quot;:
-    window = MyGame(800, 600)
-    arcade.run()
-</code></pre>
-  <button class="runprogram" cmd="getting_started">getting_started.py</button>
-</section>
-<section>
-  <h2>Components</h2>
-  <div class="container">
-    <div class="col" style="padding: 10px">
-      <h3>Client</h3>
-      <ol>
-        <li class="fragment" style="font-size: 0.7em">client connects to server</li>
-        <li class="fragment" style="font-size: 0.7em">
-          <strong>Loop A: </strong>send player input (keyboard, mouse) e.g. 30 Hz
-        </li>
-        <li class="fragment" style="font-size: 0.7em">
-          <strong>Loop B: </strong>receive game state (position, health) from server
-        </li>
-        <li class="fragment" style="font-size: 0.7em">
-          <strong>Loop C: </strong>draw game state on screen
-        </li>
-      </ol>
-    </div>
-    <div class="col" style="padding: 10px">
-      <h3>Server</h3>
-      <ol>
-        <li class="fragment" style="font-size: 0.7em">
-          <strong>Loop A: </strong>accept client connections
-        </li>
-        <li class="fragment" style="font-size: 0.7em">
-          <strong>Loop B: </strong>
-          <ol>
-            <li>receive player input</li>
-            <li>update game state</li>
-          </ol>
-        </li>
-        <li class="fragment" style="font-size: 0.7em">
-          <strong>Loop C: </strong>send game state to clients, e.g. 60 Hz
-        </li>
-      </ol>
-    </div>
-  </div>
-  <p class="fragment">Each of the internal loops runs independently.</p>
 </section>
 <section>
   <h2>🎁tip #1: use a vector class</h2>
@@ -359,6 +310,66 @@ Vec2d(9, 12)
 &gt;&gt;&gt; pixel
 Vec2d(0.6, 0.8)
 </code></pre>
+</section>
+<section style="top: 50px">
+  <h2>Getting started</h2>
+  <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">import arcade
+from pymunk.vec2d import Vec2d
+from demos.movement import KeysPressed, apply_movement
+
+class MyGame(arcade.Window):
+    def __init__(self, width, height):
+        super().__init__(width, height, title=&quot;Getting Started&quot;)
+        self.player_position = Vec2d(400, 300)
+        self.keys_pressed = KeysPressed()
+
+    def update(self, dt):
+        self.player_position = apply_movement(
+            speed=600, dt=dt, current_position=self.player_position, kp=self.keys_pressed)
+
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_rectangle_filled(
+            center_x=self.player_position.x, center_y=self.player_position.y,
+            width=50, height=50, color=arcade.color.YELLOW)
+
+    def on_key_press(self, key, modifiers):
+        self.keys_pressed.keys[key] = True
+
+    def on_key_release(self, key, modifiers):
+        self.keys_pressed.keys[key] = False
+
+if __name__ == &quot;__main__&quot;:
+    window = MyGame(800, 600)
+    arcade.run()
+</code></pre>
+  <button class="runprogram" cmd="demos.getting_started">getting_started.py</button>
+</section>
+<section>
+  <h2>&quot;Movement&quot; utils</h2>
+  <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">import arcade
+from pymunk import Vec2d
+
+MOVE_MAP = {
+    arcade.key.UP: Vec2d(0, 1),
+    arcade.key.DOWN: Vec2d(0, -1),
+    arcade.key.LEFT: Vec2d(-1, 0),
+    arcade.key.RIGHT: Vec2d(1, 0),
+}
+
+class KeysPressed:
+    def __init__(self):
+        self.keys = {k: False for k in MOVE_MAP}
+
+def apply_movement(speed, dt, current_position: Vec2d, kp: KeysPressed) -&gt; Vec2d:
+    delta_position = sum(kp.keys[k] * MOVE_MAP[k] for k in kp.keys)
+    return current_position + delta_position * speed * dt
+
+def apply_movement_norm(speed, dt, current_position: Vec2d, kp: KeysPressed) -&gt; Vec2d:
+    delta_position = sum(kp.keys[k] * MOVE_MAP[k] for k in kp.keys)
+    return current_position + delta_position.normalized() * speed * dt
+</code></pre>
+  <button class="runprogram" cmd="demos.getting_started_norm">Normalize your movement vector!</button>
 </section>
 <section>
   <h2>🎁tip #2: save &amp; load game data</h2>
@@ -437,6 +448,45 @@ https://www.safaribooksonline.com/library/view/fundamentals-of-network/978158450
       <a href="https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking">Source Multiplayer Networking - Valve</a>
     </p>
   </section>
+</section>
+<section>
+  <h2>Client-server: Components</h2>
+  <div class="container">
+    <div class="col" style="padding: 10px">
+      <h3>Client</h3>
+      <ol>
+        <li class="fragment" style="font-size: 0.7em">client connects to server</li>
+        <li class="fragment" style="font-size: 0.7em">
+          <strong>Loop A: </strong>send player input (keyboard, mouse) e.g. 30 Hz
+        </li>
+        <li class="fragment" style="font-size: 0.7em">
+          <strong>Loop B: </strong>receive game state (position, health) from server
+        </li>
+        <li class="fragment" style="font-size: 0.7em">
+          <strong>Loop C: </strong>draw game state on screen
+        </li>
+      </ol>
+    </div>
+    <div class="col" style="padding: 10px">
+      <h3>Server</h3>
+      <ol>
+        <li class="fragment" style="font-size: 0.7em">
+          <strong>Loop A: </strong>accept client connections
+        </li>
+        <li class="fragment" style="font-size: 0.7em">
+          <strong>Loop B: </strong>
+          <ol>
+            <li>receive player input</li>
+            <li>update game state</li>
+          </ol>
+        </li>
+        <li class="fragment" style="font-size: 0.7em">
+          <strong>Loop C: </strong>send game state to clients, e.g. 60 Hz
+        </li>
+      </ol>
+    </div>
+  </div>
+  <p class="fragment">Each of the internal loops runs independently.</p>
 </section>
 <section>
   <h2>Basic networking</h2>

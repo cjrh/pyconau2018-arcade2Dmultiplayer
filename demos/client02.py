@@ -164,7 +164,7 @@ async def thread_main(window: MyGame, loop):
                 (Vec2d(ps.x, ps.y), t)
             )
             window.t = 0
-            window.player_position_snapshot = window.player.position * 1
+            window.player_position_snapshot = copy.copy(window.player.position)
 
     try:
         await asyncio.gather(pusher(), receive_game_state())

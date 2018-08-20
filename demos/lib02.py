@@ -2,13 +2,13 @@ from typing import List, Dict
 import json
 from dataclasses import dataclass, asdict, field
 from arcade import key
-from demos.movement import KEYS
+from demos.movement import MOVE_MAP
 from pymunk.vec2d import Vec2d
 
 
 @dataclass
 class PlayerEvent:
-    keys: Dict = field(default_factory=lambda: {k: False for k in KEYS})
+    keys: Dict = field(default_factory=lambda: {k: False for k in MOVE_MAP})
 
     def __post_init__(self):
         self.keys = {int(k): v for k, v in self.keys.items()}

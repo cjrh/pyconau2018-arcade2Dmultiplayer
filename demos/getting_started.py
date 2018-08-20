@@ -1,6 +1,6 @@
 import arcade
 from pymunk.vec2d import Vec2d
-from demos.movement import KeysPressed, MOVE_MAP, apply_movement
+from demos.movement import KeysPressed, apply_movement
 
 class MyGame(arcade.Window):
     def __init__(self, width, height):
@@ -16,7 +16,7 @@ class MyGame(arcade.Window):
         arcade.start_render()
         arcade.draw_rectangle_filled(
             center_x=self.player_position.x, center_y=self.player_position.y,
-            width=50, height=50, color=arcade.color.GREEN_YELLOW, tilt_angle=0)
+            width=50, height=50, color=arcade.color.YELLOW)
 
     def on_key_press(self, key, modifiers):
         self.keys_pressed.keys[key] = True

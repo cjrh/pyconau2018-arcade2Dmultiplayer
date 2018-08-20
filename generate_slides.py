@@ -9,6 +9,8 @@ from dominate.util import text
 import arcade.examples
 import pathlib
 import math
+import demos.lib02
+import demos.movement
 
 
 def main():
@@ -18,7 +20,7 @@ def main():
 
     slides = [
         slide_title(),
-        slide_warning_flickering(),
+        # slide_warning_flickering(),
         slide_about_me(),
 
         slide_python_arcade(),
@@ -28,11 +30,12 @@ def main():
         slide_run_examples(),
 
         slide_big_picture(),
-        slide_getting_started(),
-        slide_strategy(),
-
-
         slide_tip_vector(),
+
+        slide_get_started_intro(),
+        slide_getting_started(),
+        slide_keyspressed(),
+
         slide_tip_save(),
         slide_lag_compensation(),
 
@@ -42,6 +45,7 @@ def main():
         slide_awesomenauts(),
 
         slide_network_models(),
+        slide_strategy(),
 
         slide_basic_networking(),
         slide_tcp_udp(),
@@ -74,8 +78,8 @@ def slide_title():
     with p(style='font-size: 0.8em'):
         text('@caleb_hattingh ● ')
         a('github.com/cjrh', href='github.com/cjrh')
-    button('server02', cls='runprogram', cmd='server02')
-    button('client02', cls='runprogram', cmd='client02')
+    button('server02', cls='runprogram', cmd='demos.server02')
+    button('client02', cls='runprogram', cmd='demos.client02')
 
 
 @section
@@ -171,12 +175,18 @@ def slide_lots_of_examples():
 
 
 @contextmanager
-def code_bullet():
+def code_bullet(btn_text='', cmd=''):
     with li():
         with pre():
             with code(cls='hljs bash', data_trim='true',
                       contenteditable='true', data_noescape='true'):
                 yield
+        if btn_text:
+            button(
+                btn_text,
+                cls='runprogram',
+                cmd=cmd)
+
 
 
 @section
@@ -186,9 +196,11 @@ def slide_run_examples():
                'sprite_move_keyboard']
     with ul():
         for example in exnames:
-            with code_bullet():
+            cmd = f'arcade.examples.{example}'
+            with code_bullet(btn_text=example, cmd=cmd):
                 text('(venv) $ python -m arcade.examples.')
                 mark(example)
+
 
 
 @section
@@ -197,24 +209,41 @@ def slide_big_picture():
     p('picture of server and networked pcs')
 
 
+@section
+def slide_get_started_intro():
+    h2('Rapid Intro to Python-Arcade')
+
+
 @section(style='top: 50px')
 def slide_getting_started():
     h2('Getting started')
     code_path = pathlib.Path('demos') / 'getting_started.py'
     with pre(style='font-size: 0.4em'):
-        with code(cls='hljs python', data_trim='true', contenteditable='true',
+        with code(cls='hljs python', data_trim='true',
                   style='max-height: unset'):
             with open(code_path) as f:
                 text(f.read())
-    button('getting_started.py', cls='runprogram', cmd='getting_started')
+    button('getting_started.py', cls='runprogram', cmd='demos.getting_started')
 
+
+@section
+def slide_keyspressed():
+    h2('"Movement" utils')
+    import inspect
+    code_text = inspect.getsource(demos.movement)
+    with pre(style='font-size: 0.4em'):
+        with code(cls='hljs python', data_trim='true',
+                  style='max-height: unset'):
+            text(code_text)
+    button('Normalize your movement vector!',
+           cls='runprogram', cmd='demos.getting_started_norm')
 
 # Here we should sketch out a basic attack strategy
 
 
 @section
 def slide_strategy():
-    h2('Components')
+    h2('Client-server: Components')
 
     def lip(text=None):
         if text:
