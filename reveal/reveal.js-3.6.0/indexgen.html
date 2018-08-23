@@ -109,6 +109,10 @@
   <button class="runprogram" cmd="demos.client02">client02</button>
 </section>
 <section>
+  <h2>WARNING</h2>
+  <h3>Screen flickering later</h3>
+</section>
+<section>
   <h2>about me</h2>
   <ul>
     <li>
@@ -291,25 +295,7 @@
   <p>picture of server and networked pcs</p>
 </section>
 <section>
-  <h2>🎁tip #1: use a vector class</h2>
-  <p>Use the one in 
-    <strong>pymunk</strong>
-  </p>
-  <pre><code class="hljs python" contenteditable="true" data-trim="true">&gt;&gt;&gt; from pymunk.vec2d import Vec2d
-&gt;&gt;&gt; pixel = Vec2d(3, 4)
-&gt;&gt;&gt; pixel.x
-3
-&gt;&gt;&gt; pixel.y
-4
-&gt;&gt;&gt;
-&gt;&gt;&gt; pixel + 2 * pixel
-Vec2d(9, 12)
-&gt;&gt;&gt; pixel.length
-5.0
-&gt;&gt;&gt; pixel.length = 1
-&gt;&gt;&gt; pixel
-Vec2d(0.6, 0.8)
-</code></pre>
+  <h2>Rapid Intro to Python-Arcade</h2>
 </section>
 <section style="top: 50px">
   <h2>Getting started</h2>
@@ -372,20 +358,25 @@ def apply_movement_norm(speed, dt, current_position: Vec2d, kp: KeysPressed) -&g
   <button class="runprogram" cmd="demos.getting_started_norm">Normalize your movement vector!</button>
 </section>
 <section>
-  <h2>🎁tip #2: save &amp; load game data</h2>
+  <h2>🎁tip #1: use a vector class</h2>
   <p>Use the one in 
-    <strong>pyglet</strong>
+    <strong>pymunk</strong>
   </p>
-  <pre><code class="hljs python" contenteditable="true" data-trim="true">import os, pyglet.resource, pathlib
-
-def save_scores(new_scores):
-    game_folder = pyglet.resource.get_settings_path(&quot;MyGame&quot;)
-    path = pathlib.Path(game_folder, &quot;highscores.txt&quot;)
-    path.mkdir(parents=True, exist_ok=True)
-    with path.open(&quot;w&quot;) as f:
-        f.write(new_scores)
+  <pre><code class="hljs python" contenteditable="true" data-trim="true">&gt;&gt;&gt; from pymunk.vec2d import Vec2d
+&gt;&gt;&gt; pixel = Vec2d(3, 4)
+&gt;&gt;&gt; pixel.x
+3
+&gt;&gt;&gt; pixel.y
+4
+&gt;&gt;&gt;
+&gt;&gt;&gt; pixel + 2 * pixel
+Vec2d(9, 12)
+&gt;&gt;&gt; pixel.length
+5.0
+&gt;&gt;&gt; pixel.length = 1
+&gt;&gt;&gt; pixel
+Vec2d(0.6, 0.8)
 </code></pre>
-  <p style="font-size: large">(pyglet gets installed when you install arcade)</p>
 </section>
 <section>
   <p>Good discussion about lag compensation
@@ -402,10 +393,18 @@ Book on safari:
 https://www.safaribooksonline.com/library/view/fundamentals-of-network/9781584505570/ch01.html    
 </p>
 </section>
-<section data-background-image="/img/shallplaygame.jpg"></section>
-<section data-background-image="/img/fortnite3.jpg"></section>
-<section data-background-image="/img/starcraft2.jpg"></section>
-<section data-background-image="/img/awesomenautsplay.jpg"></section>
+<section>
+  <section data-background-image="/img/shallplaygame.jpg"></section>
+</section>
+<section>
+  <section data-background-image="/img/fortnite3.jpg"></section>
+</section>
+<section>
+  <section data-background-image="/img/starcraft2.jpg"></section>
+</section>
+<section>
+  <section data-background-image="/img/awesomenautsplay.jpg"></section>
+</section>
 <section>
   <h2>Network models</h2>
   <section>
@@ -450,52 +449,76 @@ https://www.safaribooksonline.com/library/view/fundamentals-of-network/978158450
   </section>
 </section>
 <section>
-  <h2>Client-server: Components</h2>
-  <div class="container">
-    <div class="col" style="padding: 10px">
-      <h3>Client</h3>
-      <ol>
-        <li class="fragment" style="font-size: 0.7em">client connects to server</li>
-        <li class="fragment" style="font-size: 0.7em">
-          <strong>Loop A: </strong>send player input (keyboard, mouse) e.g. 30 Hz
-        </li>
-        <li class="fragment" style="font-size: 0.7em">
-          <strong>Loop B: </strong>receive game state (position, health) from server
-        </li>
-        <li class="fragment" style="font-size: 0.7em">
-          <strong>Loop C: </strong>draw game state on screen
-        </li>
-      </ol>
-    </div>
-    <div class="col" style="padding: 10px">
-      <h3>Server</h3>
-      <ol>
-        <li class="fragment" style="font-size: 0.7em">
-          <strong>Loop A: </strong>accept client connections
-        </li>
-        <li class="fragment" style="font-size: 0.7em">
-          <strong>Loop B: </strong>
-          <ol>
-            <li>receive player input</li>
-            <li>update game state</li>
-          </ol>
-        </li>
-        <li class="fragment" style="font-size: 0.7em">
-          <strong>Loop C: </strong>send game state to clients, e.g. 60 Hz
-        </li>
-      </ol>
-    </div>
-  </div>
-  <p class="fragment">Each of the internal loops runs independently.</p>
-</section>
-<section>
-  <h2>Basic networking</h2>
+  <h2>Communication</h2>
   <p style="font-size: 0.7em;">(assume client-server)</p>
   <ul>
-    <li>TCP versus UDP</li>
-    <li>Player inputs: client 🠊server</li>
+    <li>Player inputs: client 🠊 server</li>
     <li>Game state: client 🠈 server</li>
+    <li>TCP versus UDP</li>
   </ul>
+</section>
+<section>
+  <h2>Player input state</h2>
+  <p>send client 🠊 server</p>
+  <ul>
+    <li>
+      <b>inputs </b>not &quot;speed&quot; or &quot;position&quot;
+    </li>
+    <li>Use dataclasses:</li>
+  </ul>
+  <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">from typing import Dict
+from dataclasses import dataclass, asdict, field
+from demos.movement import MOVE_MAP
+
+@dataclass
+class PlayerEvent:
+    &quot;&quot;&quot;
+    p = PlayerEvent()
+    p.keys[arcade.key.UP] = True
+    &quot;&quot;&quot;
+    keys: Dict[int, bool] = field(
+        default_factory=lambda: {k: False for k in MOVE_MAP}
+    )
+
+    def __post_init__(self):
+        self.keys = {int(k): v for k, v in self.keys.items()}
+
+    def asdict(self):
+        return asdict(self)
+</code></pre>
+</section>
+<section>
+  <h2>Game state</h2>
+  <p>send server 🠊 client</p>
+  <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">from typing import List
+import json
+from dataclasses import dataclass, asdict
+
+
+@dataclass
+class PlayerState:
+    updated: float = 0
+    x: float = 0
+    y: float = 0
+    health: float = 0
+    ammo: float = 0
+
+
+@dataclass
+class GameState:
+    player_states: List[PlayerState]
+
+    def to_json(self):
+        d = dict(
+            player_states=[asdict(p) for p in self.player_states],
+        )
+        return json.dumps(d)
+
+    def from_json(self, data):
+        d = json.loads(data)
+        for i, p in enumerate(d['player_states']):
+            self.player_states[i] = PlayerState(**p)
+</code></pre>
 </section>
 <section>
   <h2>TCP vs UDP</h2>
@@ -517,7 +540,7 @@ https://www.safaribooksonline.com/library/view/fundamentals-of-network/978158450
   </ul>
 </section>
 <section>
-  <p>But I don't have time to show UDP in this talk!.</p>
+  <p>No time for UDP!</p>
   <img src="/img/greenninja.jpg">
   <p>Instead, we'll just show TCP (and ZeroMQ) for simplicity.</p>
 </section>
@@ -550,7 +573,7 @@ from zmq.asyncio import Context, Socket
 
 async def zmq_push(q: Queue):
     ctx = Context()
-    sock = ctx.socket()
+    sock = ctx.socket(zmq.PUSH)
     sock.connect('127.0.0.1', 9999)
     while True:
         payload: Dict = await q.get()
@@ -569,7 +592,7 @@ from zmq.asyncio import Context, Socket
 
 async def zmq_pull(q: Queue):
     ctx = Context()
-    sock = ctx.socket()
+    sock = ctx.socket(zmq.PULL)
     sock.bind('127.0.0.1', 9999)
     while True:
         payload = await sock.recv_json()
@@ -581,10 +604,134 @@ async def zmq_pull(q: Queue):
   </div>
 </section>
 <section>
-  <h2>Client: send player input to server</h2>
+  <h2>Client-server: Components</h2>
+  <p>where to begin?</p>
 </section>
 <section>
-  <h2>Server: send game state to client</h2>
+  <h2>Client-server: Components</h2>
+  <div class="container">
+    <div class="col" style="padding: 10px">
+      <h3>Client</h3>
+      <ol>
+        <li class="fragment" style="font-size: 0.7em">client connects to server</li>
+        <li class="fragment" style="font-size: 0.7em">
+          <strong>Task A: </strong>send player input (keyboard, mouse) e.g. 30 Hz
+        </li>
+        <li class="fragment" style="font-size: 0.7em">
+          <strong>Task B: </strong>receive game state (position, health) from server
+        </li>
+        <li class="fragment" style="font-size: 0.7em">
+          <strong>Task C: </strong>draw game state on screen
+        </li>
+      </ol>
+    </div>
+    <div class="col" style="padding: 10px">
+      <h3>Server</h3>
+      <ol>
+        <li class="fragment" style="font-size: 0.7em">
+          <strong>Task A: </strong>accept client connections
+        </li>
+        <li class="fragment" style="font-size: 0.7em">
+          <strong>Task B: </strong>
+          <ol>
+            <li>receive player input</li>
+            <li>update game state</li>
+          </ol>
+        </li>
+        <li class="fragment" style="font-size: 0.7em">
+          <strong>Task C: </strong>send game state to clients, e.g. 60 Hz
+        </li>
+      </ol>
+    </div>
+  </div>
+  <p class="fragment">Each of the internal tasks runs independently.</p>
+</section>
+<section>
+  <h4>Let's begin with the server</h4>
+  <p>(It's easier)</p>
+</section>
+<section>
+  <h4>Server code - main</h4>
+  <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">async def main():
+    fut = asyncio.Future()  # IGNORE!
+    app = App(signal=fut)   # IGNORE!
+
+    gs = GameState(player_states=[PlayerState(speed=150)])
+
+    ctx = Context()
+
+    sock1: Socket = ctx.socket(zmq.PUB)
+    sock1.bind('tcp://*:25000')
+    task1 = create_task(push_game_state(gs, sock1))
+
+    sock2: Socket = ctx.socket(zmq.PULL)
+    sock2.bind('tcp://*:25001')
+    task2 = create_task(update_from_client(gs, sock2))
+
+    try:
+        await asyncio.wait([task1, task2, fut], return_when=asyncio.FIRST_COMPLETED)
+    except CancelledError:
+        print('Cancelled')
+    finally:
+        sock1.close(1)
+        sock2.close(1)
+        ctx.destroy(linger=1)
+</code></pre>
+</section>
+<section>
+  <h4>Server code - tasks</h4>
+  <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">async def push_game_state(gs: GameState, sock: Socket):
+    try:
+        while True:
+            await sock.send_string(gs.to_json())
+            await asyncio.sleep(1 / SERVER_UPDATE_TICK_HZ)
+    except asyncio.CancelledError:
+        pass
+
+
+async def update_from_client(gs: GameState, sock: Socket):
+    try:
+        while True:
+            msg = await sock.recv_json()
+            event_dict = msg['event']
+            print(f'Got event dict: {event_dict}')
+            event = PlayerEvent(**event_dict)
+            update_game_state(gs, event)
+    except asyncio.CancelledError:
+        pass
+
+
+def update_game_state(gs: GameState, event: PlayerEvent):
+    player_state = gs.player_states[0]
+    p = Vec2d(player_state.x, player_state.y)
+    dt = time.time() - player_state.updated
+    p = apply_movement(player_state.speed, dt, p, event)
+    player_state.x, player_state.y = p.x, p.y
+    player_state.updated = time.time()
+</code></pre>
+</section>
+<section>
+  <h2>Client code needs 2 loops!</h2>
+  <ul>
+    <li>python-arcade has a game loop</li>
+    <li>asyncio has a loop for IO concurrency</li>
+    <li>One loop will block the other!</li>
+  </ul>
+  <p>Simplest solution: run asyncio loop in a thread</p>
+</section>
+<section>
+  <h2>Show client asyncio thread</h2>
+</section>
+<section>
+  <h2>Show client whole (no IO loop)</h2>
+  <p>Play demo - will be blocky</p>
+</section>
+<section>
+  <h2>discuss that we need interp to draw smooth</h2>
+  <p>compare two buttons - one runs full client side render, other via server.</p>
+</section>
+<section>
+  <h2>Show diagram of extrapolation</h2>
 </section>
 <section>
   <h3>Client-side interpolation</h3>
@@ -618,6 +765,34 @@ v_x = \frac{\color{red}{x_2} - x_1}
 \color{red}{y_2} = v_y \times \Delta t + y_1
 </script>
   </div>
+</section>
+<section>
+  <h2>demo</h2>
+</section>
+<section>
+  <h2>demo</h2>
+</section>
+<section>
+  <h2>add conclusions</h2>
+</section>
+<section>
+  <p>The end!</p>
+</section>
+<section>
+  <h2>🎁tip #2: save &amp; load game data</h2>
+  <p>Use the one in 
+    <strong>pyglet</strong>
+  </p>
+  <pre><code class="hljs python" contenteditable="true" data-trim="true">import os, pyglet.resource, pathlib
+
+def save_scores(new_scores):
+    game_folder = pyglet.resource.get_settings_path(&quot;MyGame&quot;)
+    path = pathlib.Path(game_folder, &quot;highscores.txt&quot;)
+    path.mkdir(parents=True, exist_ok=True)
+    with path.open(&quot;w&quot;) as f:
+        f.write(new_scores)
+</code></pre>
+  <p style="font-size: large">(pyglet gets installed when you install arcade)</p>
 </section>
     </div>
 </div>

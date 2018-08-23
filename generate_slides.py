@@ -18,47 +18,47 @@ def main():
               encoding='utf-8') as f:
         tmpl = Template(f.read())
 
-    slides = [
-        slide_title(),
-        # slide_warning_flickering(),
-        slide_about_me(),
-
-        slide_python_arcade(),
-        slide_arcade_docs(),
-        slide_why_arcade(),
-        slide_lots_of_examples(),
-        slide_run_examples(),
-
-        slide_big_picture(),
-        slide_tip_vector(),
-
-        slide_get_started_intro(),
-        slide_getting_started(),
-        slide_keyspressed(),
-
-        slide_tip_save(),
-        slide_lag_compensation(),
-
-        slide_shall(),
-        slide_fortnite(),
-        slide_sc2(),
-        slide_awesomenauts(),
-
-        slide_network_models(),
-        slide_strategy(),
-
-        slide_basic_networking(),
-        slide_tcp_udp(),
-        slide_zmq_excuse(),
-        slide_zmq(),
-        slide_zmq_demo(),
-
-        slide_transmit_inputs(),
-        slide_transmit_gamestate(),
-
-        slide_client_interpolation(),
-        slide_client_interpolation_2(),
-    ]
+    # slides = [
+    #     slide_title(),
+    #     # slide_warning_flickering(),
+    #     slide_about_me(),
+    #
+    #     slide_python_arcade(),
+    #     slide_arcade_docs(),
+    #     slide_why_arcade(),
+    #     slide_lots_of_examples(),
+    #     slide_run_examples(),
+    #
+    #     slide_big_picture(),
+    #     slide_tip_vector(),
+    #
+    #     slide_get_started_intro(),
+    #     slide_getting_started(),
+    #     slide_keyspressed(),
+    #
+    #     slide_tip_save(),
+    #     slide_lag_compensation(),
+    #
+    #     slide_shall(),
+    #     slide_fortnite(),
+    #     slide_sc2(),
+    #     slide_awesomenauts(),
+    #
+    #     slide_network_models(),
+    #     slide_strategy(),
+    #
+    #     slide_basic_networking(),
+    #     slide_tcp_udp(),
+    #     slide_zmq_excuse(),
+    #     slide_zmq(),
+    #     slide_zmq_demo(),
+    #
+    #     slide_transmit_inputs(),
+    #     slide_transmit_gamestate(),
+    #
+    #     slide_client_interpolation(),
+    #     slide_client_interpolation_2(),
+    # ]
 
     output = tmpl.safe_substitute(
         slides='\n'.join(str(s) for s in slides)
@@ -67,11 +67,37 @@ def main():
     with open('reveal/reveal.js-3.6.0/indexgen.html', 'w', encoding='utf-8') as f:
         f.write(output)
 
-
     print('Total slides: ', len(slides))
 
 
-@section
+slides = []
+
+
+def add_slide(f):
+    @section
+    def inner(*args, **kwargs):
+        f(*args, **kwargs)
+
+    slides.append(inner())
+
+
+def add_slide_plain(f):
+    @section
+    def inner(*args, **kwargs):
+        f(*args, **kwargs)
+
+    slides.append(inner())
+
+
+def add_slide50(f):
+    @section(style='top: 50px')
+    def inner(*args, **kwargs):
+        f(*args, **kwargs)
+
+    slides.append(inner())
+
+
+@add_slide
 def slide_title():
     h1('multiplayer 2D gaming')
     h2('with python-arcade')
@@ -82,13 +108,13 @@ def slide_title():
     button('client02', cls='runprogram', cmd='demos.client02')
 
 
-@section
+@add_slide
 def slide_warning_flickering():
     h2('WARNING')
     h3('Screen flickering later')
 
 
-@section
+@add_slide
 def slide_about_me():
     h2('about me')
     with ul():
@@ -106,7 +132,7 @@ def slide_about_me():
             img(src='/img/aiocover.png', height=250)
 
 
-@section
+@add_slide
 def slide_python_arcade():
     h2('Python-Arcade')
     with p():
@@ -129,12 +155,13 @@ def slide_python_arcade():
                     (venv) C:\mygame> pip install arcade
                 ''')
 
-@section
+
+@add_slide
 def slide_arcade_docs():
     img(src='/img/arcade_doc_screenshot.png')
 
 
-@section
+@add_slide
 def slide_why_arcade():
     h2('Why Python-Arcade?')
     with ul():
@@ -149,7 +176,7 @@ def slide_why_arcade():
             strong('Examples 🎁🎁🎁')
 
 
-@section
+@add_slide
 def slide_lots_of_examples():
     with h2():
         u('lots')
@@ -188,8 +215,7 @@ def code_bullet(btn_text='', cmd=''):
                 cmd=cmd)
 
 
-
-@section
+@add_slide
 def slide_run_examples():
     h2('lots of examples')
     exnames = ['bouncing_ball', 'drawing_text', 'full_screen_example',
@@ -202,19 +228,18 @@ def slide_run_examples():
                 mark(example)
 
 
-
-@section
+@add_slide
 def slide_big_picture():
     h2('The Big Picture')
     p('picture of server and networked pcs')
 
 
-@section
+@add_slide
 def slide_get_started_intro():
     h2('Rapid Intro to Python-Arcade')
 
 
-@section(style='top: 50px')
+@add_slide50
 def slide_getting_started():
     h2('Getting started')
     code_path = pathlib.Path('demos') / 'getting_started.py'
@@ -226,7 +251,7 @@ def slide_getting_started():
     button('getting_started.py', cls='runprogram', cmd='demos.getting_started')
 
 
-@section
+@add_slide
 def slide_keyspressed():
     h2('"Movement" utils')
     import inspect
@@ -238,55 +263,8 @@ def slide_keyspressed():
     button('Normalize your movement vector!',
            cls='runprogram', cmd='demos.getting_started_norm')
 
-# Here we should sketch out a basic attack strategy
 
-
-@section
-def slide_strategy():
-    h2('Client-server: Components')
-
-    def lip(text=None):
-        if text:
-            return li(text, cls='fragment', style='font-size: 0.7em')
-        else:
-            return li(cls='fragment', style='font-size: 0.7em')
-
-    with div(cls='container'):
-        with div(cls='col', style='padding: 10px'):
-            h3('Client')
-            with ol():
-                lip('client connects to server')
-                with lip():
-                    strong('Loop A: ')
-                    text('send player input (keyboard, mouse) '
-                         'e.g. 30 Hz')
-                with lip():
-                    strong('Loop B: ')
-                    text('receive game state (position, health) '
-                         'from server')
-                with lip():
-                    strong('Loop C: ')
-                    text('draw game state on screen')
-        with div(cls='col', style='padding: 10px'):
-            h3('Server')
-            with ol():
-                with lip():
-                    strong('Loop A: ')
-                    text('accept client connections')
-                with lip():
-                    strong('Loop B: ')
-                    with ol():
-                        li('receive player input')
-                        li('update game state')
-                with lip():
-                    strong('Loop C: ')
-                    text('send game state to clients, e.g. 60 Hz')
-
-    p('Each of the internal loops runs independently.',
-      cls='fragment')
-
-
-@section
+@add_slide
 def slide_tip_vector():
     h2('🎁tip #1: use a vector class')
     with p():
@@ -312,33 +290,8 @@ def slide_tip_vector():
                 Vec2d(0.6, 0.8)
             '''))
 
-@section
-def slide_tip_save():
-    h2('🎁tip #2: save & load game data')
-    with p():
-        text('Use the one in ')
-        strong('pyglet')
 
-    # <!--TODO: use pathlib-->
-    # <!--TODO: also "appdirs" package: https://pypi.org/project/appdirs/-->
-
-    with pre():
-        with code(cls='hljs python', data_trim='true', contenteditable='true'):
-            text(dedent('''\
-                import os, pyglet.resource, pathlib
-
-                def save_scores(new_scores):
-                    game_folder = pyglet.resource.get_settings_path("MyGame")
-                    path = pathlib.Path(game_folder, "highscores.txt")
-                    path.mkdir(parents=True, exist_ok=True)
-                    with path.open("w") as f:
-                        f.write(new_scores)
-            '''))
-
-    with p(style='font-size: large'):
-        text('(pyglet gets installed when you install arcade)')
-
-@section
+@add_slide
 def slide_lag_compensation():
     p(dedent('''\
 Good discussion about lag compensation
@@ -356,22 +309,27 @@ https://www.safaribooksonline.com/library/view/fundamentals-of-network/978158450
     '''))
 
 
+@add_slide_plain
 def slide_shall():
     return section(data_background_image='/img/shallplaygame.jpg')
 
+
+@add_slide_plain
 def slide_fortnite():
     return section(data_background_image='/img/fortnite3.jpg')
 
 
+@add_slide_plain
 def slide_sc2():
     return section(data_background_image='/img/starcraft2.jpg')
 
 
+@add_slide_plain
 def slide_awesomenauts():
     return section(data_background_image='/img/awesomenautsplay.jpg')
 
 
-@section
+@add_slide
 def slide_network_models():
     h2('Network models')
     with section():
@@ -402,11 +360,11 @@ def slide_network_models():
     with section():
         links = [
             a('What every programmer needs to know about game networking - Glenn Fiedler',
-                href='https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/'),
+              href='https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/'),
             a('Core network structures for games - Joost van Dongen',
-                href='http://joostdevblog.blogspot.com/2014/09/core-network-structures-for-games.html'),
+              href='http://joostdevblog.blogspot.com/2014/09/core-network-structures-for-games.html'),
             a('Source Multiplayer Networking - Valve',
-                href='https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking'),
+              href='https://developer.valvesoftware.com/wiki/Source_Multiplayer_Networking'),
         ]
 
         p('References', style='font-size: 0.6em')
@@ -414,17 +372,52 @@ def slide_network_models():
             p(link, style='font-size: 0.6em')
 
 
-@section
+@add_slide
 def slide_basic_networking():
-    h2('Basic networking')
+    h2('Communication')
     p('(assume client-server)', style='font-size: 0.7em;')
     with ul():
-        li('TCP versus UDP')
-        li('Player inputs: client 🠊server')
+        li('Player inputs: client 🠊 server')
         li('Game state: client 🠈 server')
+        li('TCP versus UDP')
 
 
-@section
+@add_slide
+def player_inputs():
+    h2('Player input state')
+    p('send client 🠊 server')
+    with ul():
+        with li():
+            b('inputs ')
+            text('not "speed" or "position"')
+        li('Use dataclasses:')
+
+    code_path = pathlib.Path('demos') / 'player_event.py'
+    with pre(style='font-size: 0.4em'):
+        with code(cls='hljs python', data_trim='true', style='max-height: unset'):
+            with open(code_path) as f:
+                text(f.read())
+
+
+def code_block(filename, lines=None):
+    code_path = pathlib.Path('demos') / filename
+    with pre(style='font-size: 0.4em'):
+        with code(cls='hljs python', data_trim='true', style='max-height: unset'):
+            with open(code_path) as f:
+                data = f.readlines()
+            if lines:
+                data = data[slice(lines[0] - 1, lines[1] - 0)]
+            text(''.join(data))
+
+
+@add_slide
+def game_state():
+    h2('Game state')
+    p('send server 🠊 client')
+    code_block('game_state.py')
+
+
+@add_slide
 def slide_tcp_udp():
     h2('TCP vs UDP')
     with ul():
@@ -433,8 +426,8 @@ def slide_tcp_udp():
             strong('too ')
             text('reliable')
             with ul():
-                    li('Dropped packets causes latency (bad!)')
-                    li("Sometimes packet loss is ok")
+                li('Dropped packets causes latency (bad!)')
+                li("Sometimes packet loss is ok")
         with li(cls='fragment'):
             text('UDP chosen for ')
             u('control')
@@ -446,16 +439,16 @@ def slide_tcp_udp():
     # others to wait.
 
 
-@section
+@add_slide
 def slide_zmq_excuse():
     with p():
-        text("But I don't have time to show UDP in this talk!.")
+        text("No time for UDP!")
     img(src='/img/greenninja.jpg')
     with p():
         text("Instead, we'll just show TCP (and ZeroMQ) for simplicity.")
 
 
-@section
+@add_slide
 def slide_zmq():
     h2('Brief intro to ZeroMQ')
     p('ZeroMQ has "magic" sockets')
@@ -473,7 +466,7 @@ def slide_zmq():
                 li('Server pushes to all clients')
 
 
-@section
+@add_slide
 def slide_zmq_demo():
     h2('ZMQ client & server')
     with div(cls='container'):
@@ -488,7 +481,7 @@ def slide_zmq_demo():
 
                         async def zmq_push(q: Queue):
                             ctx = Context()
-                            sock = ctx.socket()
+                            sock = ctx.socket(zmq.PUSH)
                             sock.connect('127.0.0.1', 9999)
                             while True:
                                 payload: Dict = await q.get()
@@ -509,7 +502,7 @@ def slide_zmq_demo():
 
                         async def zmq_pull(q: Queue):
                             ctx = Context()
-                            sock = ctx.socket()
+                            sock = ctx.socket(zmq.PULL)
                             sock.bind('127.0.0.1', 9999)
                             while True:
                                 payload = await sock.recv_json()
@@ -519,18 +512,110 @@ def slide_zmq_demo():
                     '''))
 
 
-
-@section
-def slide_transmit_inputs():
-    h2('Client: send player input to server')
-
-
-@section
-def slide_transmit_gamestate():
-    h2('Server: send game state to client')
+@add_slide
+def where_to_begin():
+    h2('Client-server: Components')
+    p('where to begin?')
 
 
-@section
+@add_slide
+def slide_strategy():
+    h2('Client-server: Components')
+
+    def lip(text=None):
+        if text:
+            return li(text, cls='fragment', style='font-size: 0.7em')
+        else:
+            return li(cls='fragment', style='font-size: 0.7em')
+
+    with div(cls='container'):
+        with div(cls='col', style='padding: 10px'):
+            h3('Client')
+            with ol():
+                lip('client connects to server')
+                with lip():
+                    strong('Task A: ')
+                    text('send player input (keyboard, mouse) '
+                         'e.g. 30 Hz')
+                with lip():
+                    strong('Task B: ')
+                    text('receive game state (position, health) '
+                         'from server')
+                with lip():
+                    strong('Task C: ')
+                    text('draw game state on screen')
+        with div(cls='col', style='padding: 10px'):
+            h3('Server')
+            with ol():
+                with lip():
+                    strong('Task A: ')
+                    text('accept client connections')
+                with lip():
+                    strong('Task B: ')
+                    with ol():
+                        li('receive player input')
+                        li('update game state')
+                with lip():
+                    strong('Task C: ')
+                    text('send game state to clients, e.g. 60 Hz')
+
+    p('Each of the internal tasks runs independently.',
+      cls='fragment')
+
+
+@add_slide
+def begin_with_server():
+    h4("Let's begin with the server")
+    p("(It's easier)")
+
+
+@add_slide
+def server_code_main():
+    h4("Server code - main")
+    code_block('server03.py', lines=[45, 68])
+
+
+@add_slide
+def server_code_tasks():
+    h4("Server code - tasks")
+    code_block('server03.py', lines=[15, 42])
+
+
+# Client code
+@add_slide
+def client_code1():
+    h2('Client code needs 2 loops!')
+    with ul():
+        li('python-arcade has a game loop')
+        li('asyncio has a loop for IO concurrency')
+        li('One loop will block the other!')
+
+    p('Simplest solution: run asyncio loop in a thread')
+
+
+@add_slide
+def client_code_thread():
+    h2('Show client asyncio thread')
+
+
+@add_slide
+def client_code_whole():
+    h2('Show client whole (no IO loop)')
+    p('Play demo - will be blocky')
+
+
+@add_slide
+def client_code_interp():
+    h2('discuss that we need interp to draw smooth')
+    p('compare two buttons - one runs full client side render, other via server.')
+
+
+@add_slide
+def client_code_prediction():
+    h2('Show diagram of extrapolation')
+
+
+@add_slide
 def slide_client_interpolation():
     h3('Client-side interpolation')
     with p():
@@ -551,7 +636,8 @@ def slide_client_interpolation():
                 \frac{\color{red}{y_2} - y_1}{\color{red}{t_2} - t_1}
             '''))
 
-@section
+
+@add_slide
 def slide_client_interpolation_2():
     h3('Client-side interpolation')
     with script(type='math/text; mode=display'):
@@ -569,6 +655,54 @@ def slide_client_interpolation_2():
                 \qquad
                 \color{red}{y_2} = v_y \times \Delta t + y_1
             '''))
+
+
+@add_slide
+def client_code_demo_4_updates_per_second():
+    h2('demo')
+
+
+@add_slide
+def client_code_demo_10_updates_per_second():
+    h2('demo')
+
+
+@add_slide
+def conclusions():
+    h2('add conclusions')
+
+
+@add_slide
+def fin():
+    p('The end!')
+
+
+@add_slide
+def slide_tip_save():
+    h2('🎁tip #2: save & load game data')
+    with p():
+        text('Use the one in ')
+        strong('pyglet')
+
+    # <!--TODO: use pathlib-->
+    # <!--TODO: also "appdirs" package: https://pypi.org/project/appdirs/-->
+
+    with pre():
+        with code(cls='hljs python', data_trim='true', contenteditable='true'):
+            text(dedent('''\
+                import os, pyglet.resource, pathlib
+
+                def save_scores(new_scores):
+                    game_folder = pyglet.resource.get_settings_path("MyGame")
+                    path = pathlib.Path(game_folder, "highscores.txt")
+                    path.mkdir(parents=True, exist_ok=True)
+                    with path.open("w") as f:
+                        f.write(new_scores)
+            '''))
+
+    with p(style='font-size: large'):
+        text('(pyglet gets installed when you install arcade)')
+
 
 if __name__ == '__main__':
     main()
