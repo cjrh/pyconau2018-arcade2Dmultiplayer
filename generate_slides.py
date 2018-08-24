@@ -101,17 +101,13 @@ def add_slide50(f):
 def slide_title():
     h1('multiplayer 2D gaming')
     h2('with python-arcade')
-    with p(style='font-size: 0.8em'):
+    with p(style='font-size: 0.7em'):
         text('@caleb_hattingh ● ')
-        a('github.com/cjrh', href='github.com/cjrh')
+        # a('github.com/cjrh', href='github.com/cjrh')
+        a('github.com/cjrh/pyconau2018-arcade2Dmultiplayer', href='github.com/cjrh/pyconau2018-arcade2Dmultiplayer')
+
     button('server02', cls='runprogram', cmd='demos.server02')
     button('client02', cls='runprogram', cmd='demos.client02')
-
-
-@add_slide
-def slide_warning_flickering():
-    h2('WARNING')
-    h3('Screen flickering later')
 
 
 @add_slide
@@ -218,7 +214,7 @@ def code_bullet(btn_text='', cmd=''):
 @add_slide
 def slide_run_examples():
     h2('lots of examples')
-    exnames = ['bouncing_ball', 'drawing_text', 'full_screen_example',
+    exnames = ['bouncing_ball', 'sprite_collect_coins',
                'sprite_move_keyboard']
     with ul():
         for example in exnames:
@@ -226,12 +222,6 @@ def slide_run_examples():
             with code_bullet(btn_text=example, cmd=cmd):
                 text('(venv) $ python -m arcade.examples.')
                 mark(example)
-
-
-@add_slide
-def slide_big_picture():
-    h2('The Big Picture')
-    p('picture of server and networked pcs')
 
 
 @add_slide
@@ -291,7 +281,7 @@ def slide_tip_vector():
             '''))
 
 
-@add_slide
+# @add_slide
 def slide_lag_compensation():
     p(dedent('''\
 Good discussion about lag compensation
@@ -373,10 +363,15 @@ def slide_network_models():
 
 
 @add_slide
+def slide_big_picture():
+    h2('Client-server: The Big Picture')
+    img(src='/img/server-based-network.svg', width=500)
+
+
+@add_slide
 def slide_basic_networking():
     h2('Communication')
-    p('(assume client-server)', style='font-size: 0.7em;')
-    with ul():
+    with ol():
         li('Player inputs: client 🠊 server')
         li('Game state: client 🠈 server')
         li('TCP versus UDP')
@@ -384,7 +379,7 @@ def slide_basic_networking():
 
 @add_slide
 def player_inputs():
-    h2('Player input state')
+    h2('1. Player input state')
     p('send client 🠊 server')
     with ul():
         with li():
@@ -399,9 +394,9 @@ def player_inputs():
                 text(f.read())
 
 
-def code_block(filename, lines=None):
+def code_block(filename, lines=None, size='0.4em'):
     code_path = pathlib.Path('demos') / filename
-    with pre(style='font-size: 0.4em'):
+    with pre(style=f'font-size: {size}'):
         with code(cls='hljs python', data_trim='true', style='max-height: unset'):
             with open(code_path) as f:
                 data = f.readlines()
@@ -412,14 +407,14 @@ def code_block(filename, lines=None):
 
 @add_slide
 def game_state():
-    h2('Game state')
+    h2('2. Game state')
     p('send server 🠊 client')
     code_block('game_state.py')
 
 
 @add_slide
 def slide_tcp_udp():
-    h2('TCP vs UDP')
+    h2('3. TCP vs UDP')
     with ul():
         with li(cls='fragment'):
             text('TCP is ')
@@ -431,7 +426,7 @@ def slide_tcp_udp():
         with li(cls='fragment'):
             text('UDP chosen for ')
             u('control')
-            text(' (not speed)')
+            text(' (not merely speed)')
             with ul():
                 li('Can choose when to allow packet loss...')
                 li("BUT: it's much more work")
@@ -451,18 +446,22 @@ def slide_zmq_excuse():
 @add_slide
 def slide_zmq():
     h2('Brief intro to ZeroMQ')
-    p('ZeroMQ has "magic" sockets')
+    p('Thin abstraction over TCP ● "magic" sockets')
     with ul():
         with li(cls='fragment'):
             text('Handling player inputs')
             with ul():
-                li('PUSH and PULL sockets')
+                with li():
+                    b('PUSH + PULL ')
+                    text('sockets')
                 li('all clients push to a single server')
 
         with li(cls='fragment'):
             text('Handling game state')
             with ul():
-                li('PUB and SUB sockets')
+                with li():
+                    b('PUB + SUB ')
+                    text('sockets')
                 li('Server pushes to all clients')
 
 
@@ -557,7 +556,7 @@ def slide_strategy():
                         li('update game state')
                 with lip():
                     strong('Task C: ')
-                    text('send game state to clients, e.g. 60 Hz')
+                    text('send game state to clients, e.g. 15 Hz')
 
     p('Each of the internal tasks runs independently.',
       cls='fragment')
@@ -571,31 +570,34 @@ def begin_with_server():
 
 @add_slide
 def server_code_main():
-    h4("Server code - main")
-    code_block('server03.py', lines=[45, 68])
+    h3("Server code - main (1/2)")
+    code_block('server03.py', lines=[44, 67], size='0.5em')
 
 
 @add_slide
 def server_code_tasks():
-    h4("Server code - tasks")
+    h3("Server code - task detail (2/2)")
     code_block('server03.py', lines=[15, 42])
 
 
 # Client code
 @add_slide
 def client_code1():
-    h2('Client code needs 2 loops!')
+    h2('Client code needs TWO loops!')
     with ul():
-        li('python-arcade has a game loop')
-        li('asyncio has a loop for IO concurrency')
-        li('One loop will block the other!')
+        li('python-arcade: game loop')
+        li('asyncio: IO loop')
+        with li():
+            b('Cannot ')
+            text('run both loops in same thread')
 
-    p('Simplest solution: run asyncio loop in a thread')
+    p('Least-effort solution: run asyncio loop in a thread')
 
 
 @add_slide
 def client_code_thread():
-    h2('Show client asyncio thread')
+    h2('Asyncio loop in a thread')
+    code_block('aiointhread.py', size='0.5em')
 
 
 @add_slide

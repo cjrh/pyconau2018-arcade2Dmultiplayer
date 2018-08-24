@@ -12,16 +12,8 @@ from demos.movement import KeysPressed, apply_movement
 SERVER_UPDATE_TICK_HZ = 10
 
 
-async def push_game_state(gs: GameState, sock: Socket):
-    try:
-        while True:
-            await sock.send_string(gs.to_json())
-            await asyncio.sleep(1 / SERVER_UPDATE_TICK_HZ)
-    except asyncio.CancelledError:
-        pass
-
-
 async def update_from_client(gs: GameState, sock: Socket):
+    """ TASK B """
     try:
         while True:
             msg = await sock.recv_json()
@@ -32,15 +24,22 @@ async def update_from_client(gs: GameState, sock: Socket):
     except asyncio.CancelledError:
         pass
 
-
 def update_game_state(gs: GameState, event: PlayerEvent):
-    player_state = gs.player_states[0]
-    p = Vec2d(player_state.x, player_state.y)
-    dt = time.time() - player_state.updated
-    p = apply_movement(player_state.speed, dt, p, event)
-    player_state.x, player_state.y = p.x, p.y
-    player_state.updated = time.time()
+    for ps in gs.player_states:
+        p = Vec2d(ps.x, ps.y)
+        dt = time.time() - ps.updated
+        p = apply_movement(ps.speed, dt, p, event)
+        ps.x, ps.y = p.x, p.y
+        ps.updated = time.time()
 
+async def push_game_state(gs: GameState, sock: Socket):
+    """ TASK C """
+    try:
+        while True:
+            await sock.send_string(gs.to_json())
+            await asyncio.sleep(1 / SERVER_UPDATE_TICK_HZ)
+    except asyncio.CancelledError:
+        pass
 
 async def main():
     fut = asyncio.Future()  # IGNORE!
@@ -48,23 +47,23 @@ async def main():
 
     gs = GameState(player_states=[PlayerState(speed=150)])
 
-    ctx = Context()
+    ctx = Context()  # "Task A" (ZeroMQ)
 
-    sock1: Socket = ctx.socket(zmq.PUB)
-    sock1.bind('tcp://*:25000')
-    task1 = create_task(push_game_state(gs, sock1))
+    sock_B: Socket = ctx.socket(zmq.PULL)
+    sock_B.bind('tcp://*:25001')
+    task_B = create_task(update_from_client(gs, sock_B))
 
-    sock2: Socket = ctx.socket(zmq.PULL)
-    sock2.bind('tcp://*:25001')
-    task2 = create_task(update_from_client(gs, sock2))
+    sock_C: Socket = ctx.socket(zmq.PUB)
+    sock_C.bind('tcp://*:25000')
+    task_C = create_task(push_game_state(gs, sock_C))
 
     try:
-        await asyncio.wait([task1, task2, fut], return_when=asyncio.FIRST_COMPLETED)
+        await asyncio.wait([task_B, task_C, fut], return_when=asyncio.FIRST_COMPLETED)
     except CancelledError:
         print('Cancelled')
     finally:
-        sock1.close(1)
-        sock2.close(1)
+        sock_B.close(1)
+        sock_C.close(1)
         ctx.destroy(linger=1)
 
 

@@ -102,15 +102,11 @@
         <section>
   <h1>multiplayer 2D gaming</h1>
   <h2>with python-arcade</h2>
-  <p style="font-size: 0.8em">@caleb_hattingh ● 
-    <a href="github.com/cjrh">github.com/cjrh</a>
+  <p style="font-size: 0.7em">@caleb_hattingh ● 
+    <a href="github.com/cjrh/pyconau2018-arcade2Dmultiplayer">github.com/cjrh/pyconau2018-arcade2Dmultiplayer</a>
   </p>
   <button class="runprogram" cmd="demos.server02">server02</button>
   <button class="runprogram" cmd="demos.client02">client02</button>
-</section>
-<section>
-  <h2>WARNING</h2>
-  <h3>Screen flickering later</h3>
 </section>
 <section>
   <h2>about me</h2>
@@ -277,22 +273,14 @@
       <button class="runprogram" cmd="arcade.examples.bouncing_ball">bouncing_ball</button>
     </li>
     <li>
-      <pre><code class="hljs bash" contenteditable="true" data-noescape="true" data-trim="true">(venv) $ python -m arcade.examples.<mark>drawing_text</mark></code></pre>
-      <button class="runprogram" cmd="arcade.examples.drawing_text">drawing_text</button>
-    </li>
-    <li>
-      <pre><code class="hljs bash" contenteditable="true" data-noescape="true" data-trim="true">(venv) $ python -m arcade.examples.<mark>full_screen_example</mark></code></pre>
-      <button class="runprogram" cmd="arcade.examples.full_screen_example">full_screen_example</button>
+      <pre><code class="hljs bash" contenteditable="true" data-noescape="true" data-trim="true">(venv) $ python -m arcade.examples.<mark>sprite_collect_coins</mark></code></pre>
+      <button class="runprogram" cmd="arcade.examples.sprite_collect_coins">sprite_collect_coins</button>
     </li>
     <li>
       <pre><code class="hljs bash" contenteditable="true" data-noescape="true" data-trim="true">(venv) $ python -m arcade.examples.<mark>sprite_move_keyboard</mark></code></pre>
       <button class="runprogram" cmd="arcade.examples.sprite_move_keyboard">sprite_move_keyboard</button>
     </li>
   </ul>
-</section>
-<section>
-  <h2>The Big Picture</h2>
-  <p>picture of server and networked pcs</p>
 </section>
 <section>
   <h2>Rapid Intro to Python-Arcade</h2>
@@ -379,21 +367,6 @@ Vec2d(0.6, 0.8)
 </code></pre>
 </section>
 <section>
-  <p>Good discussion about lag compensation
-
-https://www.reddit.com/r/Overwatch/comments/3u5kfg/everything_you_need_to_know_about_tick_rate/
-https://en.wikipedia.org/wiki/Netcode
-https://www.pcgamer.com/netcode-explained/
-
-Some python code here:
-
-https://www.gamedev.net/forums/topic/652377-network-tick-rates/
-
-Book on safari:
-https://www.safaribooksonline.com/library/view/fundamentals-of-network/9781584505570/ch01.html    
-</p>
-</section>
-<section>
   <section data-background-image="/img/shallplaygame.jpg"></section>
 </section>
 <section>
@@ -449,16 +422,19 @@ https://www.safaribooksonline.com/library/view/fundamentals-of-network/978158450
   </section>
 </section>
 <section>
+  <h2>Client-server: The Big Picture</h2>
+  <img src="/img/server-based-network.svg" width="500">
+</section>
+<section>
   <h2>Communication</h2>
-  <p style="font-size: 0.7em;">(assume client-server)</p>
-  <ul>
+  <ol>
     <li>Player inputs: client 🠊 server</li>
     <li>Game state: client 🠈 server</li>
     <li>TCP versus UDP</li>
-  </ul>
+  </ol>
 </section>
 <section>
-  <h2>Player input state</h2>
+  <h2>1. Player input state</h2>
   <p>send client 🠊 server</p>
   <ul>
     <li>
@@ -488,7 +464,7 @@ class PlayerEvent:
 </code></pre>
 </section>
 <section>
-  <h2>Game state</h2>
+  <h2>2. Game state</h2>
   <p>send server 🠊 client</p>
   <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">from typing import List
 import json
@@ -521,7 +497,7 @@ class GameState:
 </code></pre>
 </section>
 <section>
-  <h2>TCP vs UDP</h2>
+  <h2>3. TCP vs UDP</h2>
   <ul>
     <li class="fragment">TCP is 
       <strong>too </strong>reliable
@@ -531,7 +507,7 @@ class GameState:
       </ul>
     </li>
     <li class="fragment">UDP chosen for 
-      <u>control</u> (not speed)
+      <u>control</u> (not merely speed)
       <ul>
         <li>Can choose when to allow packet loss...</li>
         <li>BUT: it's much more work</li>
@@ -546,17 +522,21 @@ class GameState:
 </section>
 <section>
   <h2>Brief intro to ZeroMQ</h2>
-  <p>ZeroMQ has &quot;magic&quot; sockets</p>
+  <p>Thin abstraction over TCP ● &quot;magic&quot; sockets</p>
   <ul>
     <li class="fragment">Handling player inputs
       <ul>
-        <li>PUSH and PULL sockets</li>
+        <li>
+          <b>PUSH + PULL </b>sockets
+        </li>
         <li>all clients push to a single server</li>
       </ul>
     </li>
     <li class="fragment">Handling game state
       <ul>
-        <li>PUB and SUB sockets</li>
+        <li>
+          <b>PUB + SUB </b>sockets
+        </li>
         <li>Server pushes to all clients</li>
       </ul>
     </li>
@@ -639,7 +619,7 @@ async def zmq_pull(q: Queue):
           </ol>
         </li>
         <li class="fragment" style="font-size: 0.7em">
-          <strong>Task C: </strong>send game state to clients, e.g. 60 Hz
+          <strong>Task C: </strong>send game state to clients, e.g. 15 Hz
         </li>
       </ol>
     </div>
@@ -651,45 +631,37 @@ async def zmq_pull(q: Queue):
   <p>(It's easier)</p>
 </section>
 <section>
-  <h4>Server code - main</h4>
-  <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">async def main():
+  <h3>Server code - main (1/2)</h3>
+  <pre style="font-size: 0.5em"><code class="hljs python" data-trim="true" style="max-height: unset">async def main():
     fut = asyncio.Future()  # IGNORE!
     app = App(signal=fut)   # IGNORE!
 
     gs = GameState(player_states=[PlayerState(speed=150)])
 
-    ctx = Context()
+    ctx = Context()  # &quot;Task A&quot; (ZeroMQ)
 
-    sock1: Socket = ctx.socket(zmq.PUB)
-    sock1.bind('tcp://*:25000')
-    task1 = create_task(push_game_state(gs, sock1))
+    sock_B: Socket = ctx.socket(zmq.PULL)
+    sock_B.bind('tcp://*:25001')
+    task_B = create_task(update_from_client(gs, sock_B))
 
-    sock2: Socket = ctx.socket(zmq.PULL)
-    sock2.bind('tcp://*:25001')
-    task2 = create_task(update_from_client(gs, sock2))
+    sock_C: Socket = ctx.socket(zmq.PUB)
+    sock_C.bind('tcp://*:25000')
+    task_C = create_task(push_game_state(gs, sock_C))
 
     try:
-        await asyncio.wait([task1, task2, fut], return_when=asyncio.FIRST_COMPLETED)
+        await asyncio.wait([task_B, task_C, fut], return_when=asyncio.FIRST_COMPLETED)
     except CancelledError:
         print('Cancelled')
     finally:
-        sock1.close(1)
-        sock2.close(1)
+        sock_B.close(1)
+        sock_C.close(1)
         ctx.destroy(linger=1)
 </code></pre>
 </section>
 <section>
-  <h4>Server code - tasks</h4>
-  <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">async def push_game_state(gs: GameState, sock: Socket):
-    try:
-        while True:
-            await sock.send_string(gs.to_json())
-            await asyncio.sleep(1 / SERVER_UPDATE_TICK_HZ)
-    except asyncio.CancelledError:
-        pass
-
-
-async def update_from_client(gs: GameState, sock: Socket):
+  <h3>Server code - task detail (2/2)</h3>
+  <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">async def update_from_client(gs: GameState, sock: Socket):
+    &quot;&quot;&quot; TASK B &quot;&quot;&quot;
     try:
         while True:
             msg = await sock.recv_json()
@@ -700,27 +672,53 @@ async def update_from_client(gs: GameState, sock: Socket):
     except asyncio.CancelledError:
         pass
 
-
 def update_game_state(gs: GameState, event: PlayerEvent):
-    player_state = gs.player_states[0]
-    p = Vec2d(player_state.x, player_state.y)
-    dt = time.time() - player_state.updated
-    p = apply_movement(player_state.speed, dt, p, event)
-    player_state.x, player_state.y = p.x, p.y
-    player_state.updated = time.time()
+    for ps in gs.player_states:
+        p = Vec2d(ps.x, ps.y)
+        dt = time.time() - ps.updated
+        p = apply_movement(ps.speed, dt, p, event)
+        ps.x, ps.y = p.x, p.y
+        ps.updated = time.time()
+
+async def push_game_state(gs: GameState, sock: Socket):
+    &quot;&quot;&quot; TASK C &quot;&quot;&quot;
+    try:
+        while True:
+            await sock.send_string(gs.to_json())
+            await asyncio.sleep(1 / SERVER_UPDATE_TICK_HZ)
+    except asyncio.CancelledError:
+        pass
 </code></pre>
 </section>
 <section>
   <h2>Client code needs 2 loops!</h2>
   <ul>
     <li>python-arcade has a game loop</li>
-    <li>asyncio has a loop for IO concurrency</li>
+    <li>asyncio has an IO loop</li>
     <li>One loop will block the other!</li>
   </ul>
   <p>Simplest solution: run asyncio loop in a thread</p>
 </section>
 <section>
-  <h2>Show client asyncio thread</h2>
+  <h2>Asyncio loop in a thread</h2>
+  <pre style="font-size: 0.5em"><code class="hljs python" data-trim="true" style="max-height: unset">import threading
+import asyncio
+
+async def io_work():
+    while True:
+        print('Hi from another thread!')
+        await asyncio.sleep(1)
+
+def thread_worker():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)   # &lt;&lt;----- IMPORTANT!!
+    loop.create_task(io_work())
+    loop.run_forever()
+
+thread = threading.Thread(target=thread_worker())
+thread.start()
+thread.join()
+</code></pre>
 </section>
 <section>
   <h2>Show client whole (no IO loop)</h2>
