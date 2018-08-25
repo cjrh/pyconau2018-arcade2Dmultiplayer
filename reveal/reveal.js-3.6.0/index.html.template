@@ -21,6 +21,10 @@
             width: unset;
         }
 
+        .reveal a {
+            color: #2244ff;
+        }
+
         .reveal mark {
             color: #080e1b;
             background-color: #fff400;

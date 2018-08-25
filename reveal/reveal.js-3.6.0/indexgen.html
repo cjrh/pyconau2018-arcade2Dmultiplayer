@@ -21,6 +21,10 @@
             width: unset;
         }
 
+        .reveal a {
+            color: #2244ff;
+        }
+
         .reveal mark {
             color: #080e1b;
             background-color: #fff400;
@@ -107,6 +111,18 @@
   </p>
   <button class="runprogram" cmd="demos.server02">server02</button>
   <button class="runprogram" cmd="demos.client02">client02</button>
+</section>
+<section>
+  <h2>Goals</h2>
+  <p>Build a simple multiplayer game!</p>
+</section>
+<section>
+  <h2>Goals</h2>
+  <p>
+    <s>Build a simple multiplayer game!</s>
+  </p>
+  <div style="margin-top: 30px;"></div>
+  <p>Show &amp; tell the building blocks</p>
 </section>
 <section>
   <h2>about me</h2>
@@ -284,11 +300,11 @@
   </ul>
 </section>
 <section>
-  <h2>Rapid Intro to Python-Arcade</h2>
+  <h2>Intro: Python-Arcade</h2>
 </section>
 <section style="top: 50px">
   <h2>Getting started</h2>
-  <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">import arcade
+  <pre style="font-size: 0.4em"><code class="hljs python" data-noescape="true" data-trim="true" style="max-height: unset">import arcade
 from pymunk.vec2d import Vec2d
 from demos.movement import KeysPressed, apply_movement
 
@@ -298,8 +314,42 @@ class MyGame(arcade.Window):
         self.player_position = Vec2d(400, 300)
         self.keys_pressed = KeysPressed()
 
-    def update(self, dt):
+    <mark>def update</mark>(self, dt):
         self.player_position = apply_movement(
+            speed=600, dt=dt, current_position=self.player_position, kp=self.keys_pressed)
+
+    <mark>def on_draw</mark>(self):
+        arcade.start_render()
+        arcade.draw_rectangle_filled(
+            center_x=self.player_position.x, center_y=self.player_position.y,
+            width=50, height=50, color=arcade.color.YELLOW)
+
+    <mark>def on_key_press</mark>(self, key, modifiers):
+        self.keys_pressed.keys[key] = True
+
+    <mark>def on_key_release</mark>(self, key, modifiers):
+        self.keys_pressed.keys[key] = False
+
+if __name__ == &quot;__main__&quot;:
+    window = MyGame(800, 600)
+    arcade.run()
+</code></pre>
+  <button class="runprogram" cmd="demos.getting_started">getting_started.py</button>
+</section>
+<section style="top: 50px">
+  <h2>Getting started</h2>
+  <pre style="font-size: 0.4em"><code class="hljs python" data-noescape="true" data-trim="true" style="max-height: unset">import arcade
+from pymunk.vec2d import Vec2d
+from demos.movement import KeysPressed, apply_movement
+
+class MyGame(arcade.Window):
+    def __init__(self, width, height):
+        super().__init__(width, height, title=&quot;Getting Started&quot;)
+        self.player_position = Vec2d(400, 300)
+        <mark>self.keys_pressed</mark> = KeysPressed()
+
+    def update(self, dt):
+        self.player_position = <mark>apply_movement</mark>(
             speed=600, dt=dt, current_position=self.player_position, kp=self.keys_pressed)
 
     def on_draw(self):
@@ -309,10 +359,10 @@ class MyGame(arcade.Window):
             width=50, height=50, color=arcade.color.YELLOW)
 
     def on_key_press(self, key, modifiers):
-        self.keys_pressed.keys[key] = True
+        <mark>self.keys_pressed.keys[key] = True</mark>
 
     def on_key_release(self, key, modifiers):
-        self.keys_pressed.keys[key] = False
+        <mark>self.keys_pressed.keys[key] = False</mark>
 
 if __name__ == &quot;__main__&quot;:
     window = MyGame(800, 600)
@@ -322,6 +372,28 @@ if __name__ == &quot;__main__&quot;:
 </section>
 <section>
   <h2>&quot;Movement&quot; utils</h2>
+  <pre style="font-size: 0.5em"><code class="hljs python" data-noescape="true" data-trim="true" style="max-height: unset">import arcade
+from pymunk import Vec2d
+
+MOVE_MAP = {
+    arcade.key.UP: Vec2d(0, 1),
+    arcade.key.DOWN: Vec2d(0, -1),
+    arcade.key.LEFT: Vec2d(-1, 0),
+    arcade.key.RIGHT: Vec2d(1, 0),
+}
+
+class KeysPressed:
+    def __init__(self):
+        self.keys = {k: False for k in MOVE_MAP}
+
+def apply_movement(speed, dt, current_position: Vec2d, kp: KeysPressed) -&gt; Vec2d:
+    delta_position = sum(kp.keys[k] * MOVE_MAP[k] for k in kp.keys)
+    return <mark>current_position + delta_position * speed * dt</mark>
+
+def apply_movement_norm(speed, dt, current_position: Vec2d, kp: KeysPressed) -&gt; Vec2d:
+    delta_position = sum(kp.keys[k] * MOVE_MAP[k] for k in kp.keys)
+    return current_position + delta_position.normalized() * speed * dt
+</code></pre>
   <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">import arcade
 from pymunk import Vec2d
 
@@ -344,7 +416,6 @@ def apply_movement_norm(speed, dt, current_position: Vec2d, kp: KeysPressed) -&g
     delta_position = sum(kp.keys[k] * MOVE_MAP[k] for k in kp.keys)
     return current_position + delta_position.normalized() * speed * dt
 </code></pre>
-  <button class="runprogram" cmd="demos.getting_started_norm">Normalize your movement vector!</button>
 </section>
 <section>
   <h2>🎁tip #1: use a vector class</h2>
@@ -366,6 +437,32 @@ Vec2d(9, 12)
 &gt;&gt;&gt; pixel
 Vec2d(0.6, 0.8)
 </code></pre>
+</section>
+<section>
+  <h2>&quot;Movement&quot; utils</h2>
+  <pre style="font-size: 0.5em"><code class="hljs python" data-noescape="true" data-trim="true" style="max-height: unset">import arcade
+from pymunk import Vec2d
+
+MOVE_MAP = {
+    arcade.key.UP: Vec2d(0, 1),
+    arcade.key.DOWN: Vec2d(0, -1),
+    arcade.key.LEFT: Vec2d(-1, 0),
+    arcade.key.RIGHT: Vec2d(1, 0),
+}
+
+class KeysPressed:
+    def __init__(self):
+        self.keys = {k: False for k in MOVE_MAP}
+
+def apply_movement(speed, dt, current_position: Vec2d, kp: KeysPressed) -&gt; Vec2d:
+    delta_position = sum(kp.keys[k] * MOVE_MAP[k] for k in kp.keys)
+    return current_position + delta_position * speed * dt
+
+def apply_movement_norm(speed, dt, current_position: Vec2d, kp: KeysPressed) -&gt; Vec2d:
+    delta_position = sum(kp.keys[k] * MOVE_MAP[k] for k in kp.keys)
+    return current_position + delta_position<mark>.normalized()</mark> * speed * dt
+</code></pre>
+  <button class="runprogram" cmd="demos.getting_started_norm">Normalize your movement vector!</button>
 </section>
 <section>
   <section data-background-image="/img/shallplaygame.jpg"></section>

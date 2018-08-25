@@ -97,6 +97,29 @@ def add_slide50(f):
     slides.append(inner())
 
 
+def code_block(filename, lines=None, size='0.4em', highlights=None):
+    code_path = pathlib.Path('demos') / filename
+    with pre(style=f'font-size: {size}'):
+        with code(cls='hljs python', data_trim='true',
+                  style='max-height: unset',
+                  data_noescape='true'
+                  ):
+            with open(code_path) as f:
+                data = f.readlines()
+            if lines:
+                data = data[slice(lines[0] - 1, lines[1] - 0)]
+            content = ''.join(data)
+            if highlights:
+                c = content
+                for s in highlights:
+                    a, b, c = c.partition(s)
+                    text(a)
+                    mark(b)
+                text(c)
+            else:
+                text(''.join(data))
+
+
 @add_slide
 def slide_title():
     h1('multiplayer 2D gaming')
@@ -108,6 +131,22 @@ def slide_title():
 
     button('server02', cls='runprogram', cmd='demos.server02')
     button('client02', cls='runprogram', cmd='demos.client02')
+
+
+@add_slide
+def slide_goals():
+    h2('Goals')
+    with p():
+        text('Build a simple multiplayer game!')
+
+
+@add_slide
+def slide_goals():
+    h2('Goals')
+    with p():
+        s('Build a simple multiplayer game!')
+    div(style='margin-top: 30px;')
+    p('Show & tell the building blocks')
 
 
 @add_slide
@@ -229,18 +268,32 @@ def slide_run_examples():
 
 @add_slide
 def slide_get_started_intro():
-    h2('Rapid Intro to Python-Arcade')
+    h2('Intro: Python-Arcade')
 
 
 @add_slide50
 def slide_getting_started():
     h2('Getting started')
-    code_path = pathlib.Path('demos') / 'getting_started.py'
-    with pre(style='font-size: 0.4em'):
-        with code(cls='hljs python', data_trim='true',
-                  style='max-height: unset'):
-            with open(code_path) as f:
-                text(f.read())
+    code_block('getting_started.py',
+               highlights=[
+                   'def update',
+                   'def on_draw',
+                   'def on_key_press',
+                   'def on_key_release',
+               ])
+    button('getting_started.py', cls='runprogram', cmd='demos.getting_started')
+
+
+@add_slide50
+def slide_getting_started():
+    h2('Getting started')
+    code_block('getting_started.py',
+               highlights=[
+                   'self.keys_pressed',
+                   'apply_movement',
+                   'self.keys_pressed.keys[key] = True',
+                   'self.keys_pressed.keys[key] = False',
+               ])
     button('getting_started.py', cls='runprogram', cmd='demos.getting_started')
 
 
@@ -248,13 +301,11 @@ def slide_getting_started():
 def slide_keyspressed():
     h2('"Movement" utils')
     import inspect
-    code_text = inspect.getsource(demos.movement)
-    with pre(style='font-size: 0.4em'):
-        with code(cls='hljs python', data_trim='true',
-                  style='max-height: unset'):
-            text(code_text)
-    button('Normalize your movement vector!',
-           cls='runprogram', cmd='demos.getting_started_norm')
+    code_block('movement.py',
+               size='0.5em',
+               highlights=[
+                   'current_position + delta_position * speed * dt'
+               ])
 
 
 @add_slide
@@ -282,6 +333,22 @@ def slide_tip_vector():
                 >>> pixel
                 Vec2d(0.6, 0.8)
             '''))
+
+
+@add_slide
+def slide_keyspressed():
+    h2('"Movement" utils')
+    import inspect
+    # code_text = inspect.getsource(demos.movement)
+    code_block('movement.py',
+               size='0.5em',
+               highlights=['.normalized()'])
+    # with pre(style='font-size: 0.4em'):
+    #     with code(cls='hljs python', data_trim='true',
+    #               style='max-height: unset'):
+    #         text(code_text)
+    button('Normalize your movement vector!',
+           cls='runprogram', cmd='demos.getting_started_norm')
 
 
 # @add_slide
@@ -395,29 +462,6 @@ def player_inputs():
         with code(cls='hljs python', data_trim='true', style='max-height: unset'):
             with open(code_path) as f:
                 text(f.read())
-
-
-def code_block(filename, lines=None, size='0.4em', highlights=None):
-    code_path = pathlib.Path('demos') / filename
-    with pre(style=f'font-size: {size}'):
-        with code(cls='hljs python', data_trim='true',
-                  style='max-height: unset',
-                  data_noescape='true'
-                  ):
-            with open(code_path) as f:
-                data = f.readlines()
-            if lines:
-                data = data[slice(lines[0] - 1, lines[1] - 0)]
-            content = ''.join(data)
-            if highlights:
-                c = content
-                for s in highlights:
-                    a, b, c = c.partition(s)
-                    text(a)
-                    mark(b)
-                text(c)
-            else:
-                text(''.join(data))
 
 
 @add_slide
