@@ -18,48 +18,6 @@ def main():
               encoding='utf-8') as f:
         tmpl = Template(f.read())
 
-    # slides = [
-    #     slide_title(),
-    #     # slide_warning_flickering(),
-    #     slide_about_me(),
-    #
-    #     slide_python_arcade(),
-    #     slide_arcade_docs(),
-    #     slide_why_arcade(),
-    #     slide_lots_of_examples(),
-    #     slide_run_examples(),
-    #
-    #     slide_big_picture(),
-    #     slide_tip_vector(),
-    #
-    #     slide_get_started_intro(),
-    #     slide_getting_started(),
-    #     slide_keyspressed(),
-    #
-    #     slide_tip_save(),
-    #     slide_lag_compensation(),
-    #
-    #     slide_shall(),
-    #     slide_fortnite(),
-    #     slide_sc2(),
-    #     slide_awesomenauts(),
-    #
-    #     slide_network_models(),
-    #     slide_strategy(),
-    #
-    #     slide_basic_networking(),
-    #     slide_tcp_udp(),
-    #     slide_zmq_excuse(),
-    #     slide_zmq(),
-    #     slide_zmq_demo(),
-    #
-    #     slide_transmit_inputs(),
-    #     slide_transmit_gamestate(),
-    #
-    #     slide_client_interpolation(),
-    #     slide_client_interpolation_2(),
-    # ]
-
     output = tmpl.safe_substitute(
         slides='\n'.join(str(s) for s in slides)
     )
@@ -128,10 +86,6 @@ def slide_title():
         text('@caleb_hattingh ● ')
         # a('github.com/cjrh', href='github.com/cjrh')
         a('github.com/cjrh/pyconau2018-arcade2Dmultiplayer', href='github.com/cjrh/pyconau2018-arcade2Dmultiplayer')
-
-    button('server02', cls='runprogram', cmd='demos.server02')
-    button('client02', cls='runprogram', cmd='demos.client02')
-
 
 @add_slide
 def slide_goals():
@@ -300,7 +254,6 @@ def slide_getting_started():
 @add_slide
 def slide_keyspressed():
     h2('"Movement" utils')
-    import inspect
     code_block('movement.py',
                size='0.5em',
                highlights=[
@@ -457,18 +410,18 @@ def player_inputs():
             text('not "speed" or "position"')
         li('Use dataclasses:')
 
-    code_path = pathlib.Path('demos') / 'player_event.py'
-    with pre(style='font-size: 0.4em'):
-        with code(cls='hljs python', data_trim='true', style='max-height: unset'):
-            with open(code_path) as f:
-                text(f.read())
+    code_block('player_event.py', highlights=['class PlayerEvent'])
 
 
 @add_slide
 def game_state():
     h2('2. Game state')
     p('send server 🠊 client')
-    code_block('game_state.py')
+    code_block('game_state.py', highlights=[
+        'x: float = 0',
+        'y: float = 0',
+        'class GameState'
+    ])
 
 
 @add_slide
@@ -543,8 +496,6 @@ def slide_zmq_demo():
                             sock.connect('127.0.0.1', 9999)
                             while True:
                                 payload: Dict = await q.get()
-                                if payload is None: 
-                                    break
                                 await sock.send_json(payload)
                             
                             ctx.destroy()
@@ -571,14 +522,8 @@ def slide_zmq_demo():
 
 
 @add_slide
-def where_to_begin():
-    h2('Client-server: Components')
-    p('where to begin?')
-
-
-@add_slide
 def slide_strategy():
-    h2('Client-server: Components')
+    h2('Client-server: Design')
 
     def lip(text=None):
         if text:
@@ -641,7 +586,7 @@ def server_code_main():
 @add_slide
 def server_code_tasks():
     h3("Server code - task detail (2/2)")
-    code_block('server03.py', lines=[15, 42])
+    code_block('server03.py', lines=[15, 42], highlights=['TASK B', 'TASK C'])
 
 
 # Client code
@@ -663,7 +608,7 @@ def client_code1():
 @add_slide
 def client_code_whole():
     h3('Client code - main (1/3)')
-    code_block('client03.py', size='0.5em', lines=[131, 145],
+    code_block('client03.py', size='0.5em', lines=[131, 146],
                highlights=['iomain', 'MyGame']
                )
 
@@ -689,23 +634,36 @@ def client_code_game():
 
 @add_slide
 def client_code_interp():
-    h2('discuss that we need interp to draw smooth')
-    p('compare two buttons - one runs full client side render, other via server.')
+    h2('Success demo!')
+
+    button('server', cls='runprogram', cmd='demos.server02')
+    button('client', cls='runprogram', cmd='demos.client02b')
+
+
+@add_slide
+def end_slide01():
+    p('End*')
+
+
+@add_slide
+def client_not_success():
+    h5("(Not success - it's laggy)!")
 
 
 @add_slide
 def client_code_prediction():
-    h2('Show diagram of extrapolation')
+    h2('Sprite interpolation')
+    img(src='/img/prevlatestupdate.svg', width='80%')
 
 
 @add_slide
 def slide_client_interpolation():
-    h3('Client-side interpolation')
+    h3('Client-side extrapolation')
     with p():
         text('Need to understand ')
         u('motion')
         text(', i.e., speed')
-    with script(type='math/text; mode=display'):
+    with script(type='math/tex; mode=display'):
         text(dedent(r'''
             v_x = \frac{x_1 - x_0}{t_1 - t_0} \qquad v_y = \frac{y_1 - y_0}{t_1 - t_0}
         '''))
@@ -722,7 +680,7 @@ def slide_client_interpolation():
 
 @add_slide
 def slide_client_interpolation_2():
-    h3('Client-side interpolation')
+    h3('Client-side extrapolation')
     with script(type='math/text; mode=display'):
         text(dedent(r'''
             v_x = \frac{\color{red}{x_2} - x_1}
@@ -741,50 +699,43 @@ def slide_client_interpolation_2():
 
 
 @add_slide
+def slide_client_interpolation_3():
+    h3('Client-side extrapolation')
+    with ul():
+        li('Store last 2 server updates')
+        li('Calculate predicted future update (extrapolation)')
+        li('DRAW interpolated positions between "now" and the predicted '
+           'future position.')
+
+
+@add_slide
+def slide_client_interp_code():
+    h3('Client-side extrapolation')
+    code_block('client02d.py', size='0.5em',
+               lines=[156,166],
+               highlights=[
+                   'window.position_buffer.append',
+                   'window.t',
+                   'window.player_position_snapshot'
+               ])
+
+
+@add_slide
 def client_code_demo_4_updates_per_second():
-    h2('demo')
+    h2('Success demo attempt #2!')
 
+    p('Prediction + interpolation (2 Hz server updates)')
+    button('server', cls='runprogram', cmd='demos.server02c')
+    button('client', cls='runprogram', cmd='demos.client02c')
 
-@add_slide
-def client_code_demo_10_updates_per_second():
-    h2('demo')
-
-
-@add_slide
-def conclusions():
-    h2('add conclusions')
+    p('Prediction + interpolation (10 Hz server updates)')
+    button('server', cls='runprogram', cmd='demos.server02')
+    button('client', cls='runprogram', cmd='demos.client02')
 
 
 @add_slide
 def fin():
     p('The end!')
-
-
-@add_slide
-def slide_tip_save():
-    h2('🎁tip #2: save & load game data')
-    with p():
-        text('Use the one in ')
-        strong('pyglet')
-
-    # <!--TODO: use pathlib-->
-    # <!--TODO: also "appdirs" package: https://pypi.org/project/appdirs/-->
-
-    with pre():
-        with code(cls='hljs python', data_trim='true', contenteditable='true'):
-            text(dedent('''\
-                import os, pyglet.resource, pathlib
-
-                def save_scores(new_scores):
-                    game_folder = pyglet.resource.get_settings_path("MyGame")
-                    path = pathlib.Path(game_folder, "highscores.txt")
-                    path.mkdir(parents=True, exist_ok=True)
-                    with path.open("w") as f:
-                        f.write(new_scores)
-            '''))
-
-    with p(style='font-size: large'):
-        text('(pyglet gets installed when you install arcade)')
 
 
 if __name__ == '__main__':

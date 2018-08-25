@@ -13,6 +13,7 @@ class PlayerEvent:
     )
 
     def __post_init__(self):
+        # Cast keys to int (JSON deserialization situations)
         self.keys = {int(k): v for k, v in self.keys.items()}
 
     def asdict(self):

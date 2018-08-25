@@ -109,8 +109,6 @@
   <p style="font-size: 0.7em">@caleb_hattingh ● 
     <a href="github.com/cjrh/pyconau2018-arcade2Dmultiplayer">github.com/cjrh/pyconau2018-arcade2Dmultiplayer</a>
   </p>
-  <button class="runprogram" cmd="demos.server02">server02</button>
-  <button class="runprogram" cmd="demos.client02">client02</button>
 </section>
 <section>
   <h2>Goals</h2>
@@ -394,28 +392,6 @@ def apply_movement_norm(speed, dt, current_position: Vec2d, kp: KeysPressed) -&g
     delta_position = sum(kp.keys[k] * MOVE_MAP[k] for k in kp.keys)
     return current_position + delta_position.normalized() * speed * dt
 </code></pre>
-  <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">import arcade
-from pymunk import Vec2d
-
-MOVE_MAP = {
-    arcade.key.UP: Vec2d(0, 1),
-    arcade.key.DOWN: Vec2d(0, -1),
-    arcade.key.LEFT: Vec2d(-1, 0),
-    arcade.key.RIGHT: Vec2d(1, 0),
-}
-
-class KeysPressed:
-    def __init__(self):
-        self.keys = {k: False for k in MOVE_MAP}
-
-def apply_movement(speed, dt, current_position: Vec2d, kp: KeysPressed) -&gt; Vec2d:
-    delta_position = sum(kp.keys[k] * MOVE_MAP[k] for k in kp.keys)
-    return current_position + delta_position * speed * dt
-
-def apply_movement_norm(speed, dt, current_position: Vec2d, kp: KeysPressed) -&gt; Vec2d:
-    delta_position = sum(kp.keys[k] * MOVE_MAP[k] for k in kp.keys)
-    return current_position + delta_position.normalized() * speed * dt
-</code></pre>
 </section>
 <section>
   <h2>🎁tip #1: use a vector class</h2>
@@ -540,12 +516,12 @@ def apply_movement_norm(speed, dt, current_position: Vec2d, kp: KeysPressed) -&g
     </li>
     <li>Use dataclasses:</li>
   </ul>
-  <pre style="font-size: 0.4em"><code class="hljs python" data-trim="true" style="max-height: unset">from typing import Dict
+  <pre style="font-size: 0.4em"><code class="hljs python" data-noescape="true" data-trim="true" style="max-height: unset">from typing import Dict
 from dataclasses import dataclass, asdict, field
 from demos.movement import MOVE_MAP
 
 @dataclass
-class PlayerEvent:
+<mark>class PlayerEvent</mark>:
     &quot;&quot;&quot;
     p = PlayerEvent()
     p.keys[arcade.key.UP] = True
@@ -555,6 +531,7 @@ class PlayerEvent:
     )
 
     def __post_init__(self):
+        # Cast keys to int (JSON deserialization situations)
         self.keys = {int(k): v for k, v in self.keys.items()}
 
     def asdict(self):
@@ -572,14 +549,14 @@ from dataclasses import dataclass, asdict
 @dataclass
 class PlayerState:
     updated: float = 0
-    x: float = 0
-    y: float = 0
+    <mark>x: float = 0</mark>
+    <mark>y: float = 0</mark>
     health: float = 0
     ammo: float = 0
 
 
 @dataclass
-class GameState:
+<mark>class GameState</mark>:
     player_states: List[PlayerState]
 
     def to_json(self):
@@ -655,8 +632,6 @@ async def zmq_push(q: Queue):
     sock.connect('127.0.0.1', 9999)
     while True:
         payload: Dict = await q.get()
-        if payload is None: 
-            break
         await sock.send_json(payload)
 
     ctx.destroy()
@@ -682,11 +657,7 @@ async def zmq_pull(q: Queue):
   </div>
 </section>
 <section>
-  <h2>Client-server: Components</h2>
-  <p>where to begin?</p>
-</section>
-<section>
-  <h2>Client-server: Components</h2>
+  <h2>Client-server: Design</h2>
   <div class="container">
     <div class="col" style="padding: 10px">
       <h3>Client</h3>
@@ -759,7 +730,7 @@ async def zmq_pull(q: Queue):
 <section>
   <h3>Server code - task detail (2/2)</h3>
   <pre style="font-size: 0.4em"><code class="hljs python" data-noescape="true" data-trim="true" style="max-height: unset">async def update_from_client(gs: GameState, sock: Socket):
-    &quot;&quot;&quot; TASK B &quot;&quot;&quot;
+    &quot;&quot;&quot; <mark>TASK B</mark> &quot;&quot;&quot;
     try:
         while True:
             msg = await sock.recv_json()
@@ -779,7 +750,7 @@ def update_game_state(gs: GameState, event: PlayerEvent):
         ps.updated = time.time()
 
 async def push_game_state(gs: GameState, sock: Socket):
-    &quot;&quot;&quot; TASK C &quot;&quot;&quot;
+    &quot;&quot;&quot; <mark>TASK C</mark> &quot;&quot;&quot;
     try:
         while True:
             await sock.send_string(gs.to_json())
@@ -816,6 +787,7 @@ def main():
     arcade.run()
 
 if __name__ == &quot;__main__&quot;:
+    main()
 </code></pre>
 </section>
 <section>
@@ -893,18 +865,26 @@ class <mark>MyGame</mark>(arcade.Window):
 </code></pre>
 </section>
 <section>
-  <h2>discuss that we need interp to draw smooth</h2>
-  <p>compare two buttons - one runs full client side render, other via server.</p>
+  <h2>Success demo!</h2>
+  <button class="runprogram" cmd="demos.server02">server</button>
+  <button class="runprogram" cmd="demos.client02b">client</button>
 </section>
 <section>
-  <h2>Show diagram of extrapolation</h2>
+  <p>End*</p>
 </section>
 <section>
-  <h3>Client-side interpolation</h3>
+  <h5>(Not success - it's laggy)!</h5>
+</section>
+<section>
+  <h2>Sprite interpolation</h2>
+  <img src="/img/prevlatestupdate.svg" width="80%">
+</section>
+<section>
+  <h3>Client-side extrapolation</h3>
   <p>Need to understand 
     <u>motion</u>, i.e., speed
   </p>
-  <script type="math/text; mode=display">
+  <script type="math/tex; mode=display">
 v_x = \frac{x_1 - x_0}{t_1 - t_0} \qquad v_y = \frac{y_1 - y_0}{t_1 - t_0}
 </script>
   <p class="fragment">This describes the past—what about the future?</p>
@@ -933,32 +913,24 @@ v_x = \frac{\color{red}{x_2} - x_1}
   </div>
 </section>
 <section>
-  <h2>demo</h2>
+  <h3>Client-side interpolation</h3>
+  <ul>
+    <li>Store last 2 server updates</li>
+    <li>Calculate predicted future update (extrapolation)</li>
+    <li>DRAW interpolated positions between &quot;now&quot; and the predicted future position.</li>
+  </ul>
 </section>
 <section>
-  <h2>demo</h2>
-</section>
-<section>
-  <h2>add conclusions</h2>
+  <h2>Success demo attempt #2!</h2>
+  <p>Prediction + interpolation (2 Hz server updates)</p>
+  <button class="runprogram" cmd="demos.server02c">server</button>
+  <button class="runprogram" cmd="demos.client02c">client</button>
+  <p>Prediction + interpolation (10 Hz server updates)</p>
+  <button class="runprogram" cmd="demos.server02">server</button>
+  <button class="runprogram" cmd="demos.client02">client</button>
 </section>
 <section>
   <p>The end!</p>
-</section>
-<section>
-  <h2>🎁tip #2: save &amp; load game data</h2>
-  <p>Use the one in 
-    <strong>pyglet</strong>
-  </p>
-  <pre><code class="hljs python" contenteditable="true" data-trim="true">import os, pyglet.resource, pathlib
-
-def save_scores(new_scores):
-    game_folder = pyglet.resource.get_settings_path(&quot;MyGame&quot;)
-    path = pathlib.Path(game_folder, &quot;highscores.txt&quot;)
-    path.mkdir(parents=True, exist_ok=True)
-    with path.open(&quot;w&quot;) as f:
-        f.write(new_scores)
-</code></pre>
-  <p style="font-size: large">(pyglet gets installed when you install arcade)</p>
 </section>
     </div>
 </div>
