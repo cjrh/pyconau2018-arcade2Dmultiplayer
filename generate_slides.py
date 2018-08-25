@@ -126,6 +126,9 @@ def slide_about_me():
         with div(style='display: inline-block'):
             p('April 2018!', style='font-size: 0.6em; margin: 0')
             img(src='/img/aiocover.png', height=250)
+    a('https://www.safaribooksonline.com/search/?query=caleb%20hattingh',
+      href='https://www.safaribooksonline.com/search/?query=caleb%20hattingh',
+      style='font-size: 0.6em;')
 
 
 @add_slide
@@ -394,15 +397,27 @@ def player_inputs():
                 text(f.read())
 
 
-def code_block(filename, lines=None, size='0.4em'):
+def code_block(filename, lines=None, size='0.4em', highlights=None):
     code_path = pathlib.Path('demos') / filename
     with pre(style=f'font-size: {size}'):
-        with code(cls='hljs python', data_trim='true', style='max-height: unset'):
+        with code(cls='hljs python', data_trim='true',
+                  style='max-height: unset',
+                  data_noescape='true'
+                  ):
             with open(code_path) as f:
                 data = f.readlines()
             if lines:
                 data = data[slice(lines[0] - 1, lines[1] - 0)]
-            text(''.join(data))
+            content = ''.join(data)
+            if highlights:
+                c = content
+                for s in highlights:
+                    a, b, c = c.partition(s)
+                    text(a)
+                    mark(b)
+                text(c)
+            else:
+                text(''.join(data))
 
 
 @add_slide
@@ -417,7 +432,7 @@ def slide_tcp_udp():
     h2('3. TCP vs UDP')
     with ul():
         with li(cls='fragment'):
-            text('TCP is ')
+            text('Problem: TCP is ')
             strong('too ')
             text('reliable')
             with ul():
@@ -571,7 +586,12 @@ def begin_with_server():
 @add_slide
 def server_code_main():
     h3("Server code - main (1/2)")
-    code_block('server03.py', lines=[44, 67], size='0.5em')
+    code_block('server03.py', lines=[44, 67], size='0.5em',
+               highlights=[
+                   'Task A',
+                   'task_B',
+                   'task_C'
+               ])
 
 
 @add_slide
@@ -592,19 +612,36 @@ def client_code1():
             text('run both loops in same thread')
 
     p('Least-effort solution: run asyncio loop in a thread')
-
-
-@add_slide
-def client_code_thread():
-    h2('Asyncio loop in a thread')
-    code_block('aiointhread.py', size='0.5em')
+    # mention - because of asyncio, only need 1 extra thread, whereas
+    # blocking sockets would need more.
 
 
 @add_slide
 def client_code_whole():
-    h2('Show client whole (no IO loop)')
-    p('Play demo - will be blocky')
+    h3('Client code - main (1/3)')
+    code_block('client03.py', size='0.5em', lines=[131, 145],
+               highlights=['iomain', 'MyGame']
+               )
 
+
+@add_slide
+def client_code_io():
+    h3('Client code - iomain thread (2/3)')
+    # should also use the "empty" version here
+    # rename window.t to window.time_since_state_update
+    code_block('client03-empty.py', size='0.4em', lines=[61, 92],
+               highlights=['iomain', 'window.player_input',
+                           'window.game_state.from_json',
+                           'window.player.position'])
+
+
+@add_slide
+def client_code_game():
+    h3('Client code - game object (3/3)')
+    # Need a version without any prediction!
+    # And then later also need a version WITH prediction.
+    code_block('client03-empty.py', size='0.4em', lines=[27, 60],
+               highlights=['MyGame', 'pass'])
 
 @add_slide
 def client_code_interp():

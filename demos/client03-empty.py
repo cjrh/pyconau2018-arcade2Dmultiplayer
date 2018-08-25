@@ -32,59 +32,24 @@ class Rectangle:
         self.filled = filled
 
     def draw(self):
-        if self.filled:
-            arcade.draw_rectangle_filled(self.position.x, self.position.y, 50, 50, self.color)
-        else:
-            arcade.draw_rectangle_outline(self.position.x, self.position.y, 50, 50, self.color, border_width=4)
+      if self.filled:
+        arcade.draw_rectangle_filled(self.position.x, self.position.y, 50, 50, self.color)
+      else:
+        arcade.draw_rectangle_outline(self.position.x, self.position.y, 50, 50, self.color, border_width=4)
 
 class MyGame(arcade.Window):
     def __init__(self, width, height):
         super().__init__(width, height, title="Multiplayer Demo")
         arcade.set_background_color(arcade.color.GRAY)
-
-        self.player = Rectangle(0, 0, arcade.color.GREEN_YELLOW, filled=False)
-        self.player_position_snapshot = copy.copy(self.player.position)
-
-        self.ghost = Rectangle(0, 0, arcade.color.BLACK)
-
-        self.player_input = PlayerEvent()
         self.game_state = GameState(player_states=[PlayerState()])
-        self.position_buffer = deque(maxlen=2)
-        self.time_since_state_update = 0
+        self.player = Rectangle(0, 0, arcade.color.GREEN_YELLOW, filled=False)
+        self.player_input = PlayerEvent()
 
     def update(self, dt):
-        # Now calculate the new position based on the server information
-        if len(self.position_buffer) < 2:
-            return
-
-        # These are the last two positions. p1 is the latest, p0 is the
-        # one immediately preceding it.
-        p0, t0 = self.position_buffer[0]
-        p1, t1 = self.position_buffer[1]
-
-        dtt = t1 - t0
-        if dtt == 0:
-            return
-
-        # Calculate a PREDICTED future position, based on these two.
-        velocity = (p1 - p0) / dtt
-
-        # predicted position
-        predicted_position = velocity * dtt + p1
-
-        x = (self.time_since_state_update - 0) / dtt
-        x = min(x, 1)
-        interp_position = self.player_position_snapshot.interpolate_to(predicted_position, x)
-
-        self.player.position = interp_position
-        # self.player.position = p1
-        self.ghost.position = p1
-
-        self.time_since_state_update += dt
+        pass
 
     def on_draw(self):
         arcade.start_render()
-        self.ghost.draw()
         self.player.draw()
 
     def on_key_press(self, key, modifiers):
@@ -118,9 +83,7 @@ async def iomain(window: MyGame, loop):
             gs_string = await sub_sock.recv_string()
             window.game_state.from_json(gs_string)
             ps = window.game_state.player_states[0]
-            window.position_buffer.append( (Vec2d(ps.x, ps.y), time.time()) )
-            window.time_since_state_update = 0
-            window.player_position_snapshot = copy.copy(window.player.position)
+            window.player.position = Vec2d(ps.x, ps.y)
 
     try:
         await asyncio.gather(send_player_input(), receive_game_state())
