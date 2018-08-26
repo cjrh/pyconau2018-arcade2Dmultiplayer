@@ -112,15 +112,15 @@
 </section>
 <section>
   <h2>Goals</h2>
-  <p>Build a simple multiplayer game!</p>
+  <p>Show you how to build a simple multiplayer game!</p>
 </section>
 <section>
   <h2>Goals</h2>
   <p>
-    <s>Build a simple multiplayer game!</s>
+    <s>Show you how to build a simple multiplayer game!</s>
   </p>
   <div style="margin-top: 30px;"></div>
-  <p>Show &amp; tell the building blocks</p>
+  <p>Show you the building blocks</p>
 </section>
 <section>
   <h2>about me</h2>
@@ -791,6 +791,9 @@ if __name__ == &quot;__main__&quot;:
 </code></pre>
 </section>
 <section>
+  <img src="/img/gross.gif">
+</section>
+<section>
   <h3>Client code - iomain thread (2/3)</h3>
   <pre style="font-size: 0.4em"><code class="hljs python" data-noescape="true" data-trim="true" style="max-height: unset">
 async def <mark>iomain</mark>(window: MyGame, loop):
@@ -897,7 +900,7 @@ v_x = \frac{\color{red}{x_2} - x_1}
   </div>
 </section>
 <section>
-  <h3>Client-side interpolation</h3>
+  <h3>Client-side extrapolation</h3>
   <script type="math/text; mode=display">
 v_x = \frac{\color{red}{x_2} - x_1}
 {\color{red}{t_2} - t_1} \qquad v_y =
@@ -913,12 +916,51 @@ v_x = \frac{\color{red}{x_2} - x_1}
   </div>
 </section>
 <section>
-  <h3>Client-side interpolation</h3>
+  <h3>Client-side extrapolation</h3>
   <ul>
     <li>Store last 2 server updates</li>
     <li>Calculate predicted future update (extrapolation)</li>
     <li>DRAW interpolated positions between &quot;now&quot; and the predicted future position.</li>
   </ul>
+</section>
+<section>
+  <h3>Client-side extrapolation</h3>
+  <pre style="font-size: 0.5em"><code class="hljs python" data-noescape="true" data-trim="true" style="max-height: unset">
+    async def receive_game_state():
+        while True:
+            gs_string = await sub_sock.recv_string()
+            window.game_state.from_json(gs_string)
+            ps = window.game_state.player_states[0]
+            t = time.time()
+            <mark>window.position_buffer.append</mark>(
+                (Vec2d(ps.x, ps.y), t)
+            )
+            <mark>window.t</mark> = 0
+<mark></mark></code></pre>
+</section>
+<section>
+  <h3>Client-side extrapolation</h3>
+  <pre style="font-size: 0.5em"><code class="hljs python" data-noescape="true" data-trim="true" style="max-height: unset">    def update(self, dt):
+        # These are the most recent two positions. p1 is the latest, p0 is the
+        # one immediately preceding it.
+        p0, t0 = self.position_buffer[0]
+        p1, t1 = self.position_buffer[1]
+
+        # Velocity
+        velocity = (p1 - p0) / (t1 - t0)
+
+        # Extrapolated position: PREDICTED future position, based on constant velocity.
+        <mark>predicted_position</mark> = velocity * (t1 - t0) + p1
+
+        # Interpolation parameter: &quot;x&quot; changes from ZERO to ONE
+        <mark>x = (self.t - 0) / (t1 - t0)</mark>
+        x = min(x, 1)
+        self.player.position = self.player_position_snapshot.interpolate_to(
+            predicted_position, x)
+
+        self.server.position = p1
+
+</code></pre>
 </section>
 <section>
   <h2>Success demo attempt #2!</h2>

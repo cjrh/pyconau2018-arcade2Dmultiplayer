@@ -87,34 +87,24 @@ class MyGame(arcade.Window):
         return (1 - t) * v0 + t * v1
 
     def update(self, dt):
-        # Now calculate the new position based on the server information
-        if len(self.position_buffer) < 2:
-            return
-
-        # These are the last two positions. p1 is the latest, p0 is the
+        # These are the most recent two positions. p1 is the latest, p0 is the
         # one immediately preceding it.
         p0, t0 = self.position_buffer[0]
         p1, t1 = self.position_buffer[1]
 
-        dtt = t1 - t0
-        if dtt == 0:
-            return
+        # Velocity
+        velocity = (p1 - p0) / (t1 - t0)
 
-        # Calculate a PREDICTED future position, based on these two.
-        velocity = (p1 - p0) / dtt
+        # Extrapolated position: PREDICTED future position, based on constant velocity.
+        predicted_position = velocity * (t1 - t0) + p1
 
-        # predicted position
-        predicted_position = velocity * dtt + p1
-
-        x = (self.t - 0) / dtt
+        # Interpolation parameter: "x" changes from ZERO to ONE
+        x = (self.t - 0) / (t1 - t0)
         x = min(x, 1)
-        interp_position = self.lerp(
-            self.player_position_snapshot, predicted_position, x
-        )
+        self.player.position = self.player_position_snapshot.interpolate_to(
+            predicted_position, x)
 
-        self.player.position = interp_position
-        # self.player.position = p1
-        self.ghost.position = p1
+        self.server.position = p1
 
         self.t += dt
 

@@ -91,16 +91,16 @@ def slide_title():
 def slide_goals():
     h2('Goals')
     with p():
-        text('Build a simple multiplayer game!')
+        text('Show you how to build a simple multiplayer game!')
 
 
 @add_slide
 def slide_goals():
     h2('Goals')
     with p():
-        s('Build a simple multiplayer game!')
+        s('Show you how to build a simple multiplayer game!')
     div(style='margin-top: 30px;')
-    p('Show & tell the building blocks')
+    p('Show you the building blocks')
 
 
 @add_slide
@@ -614,6 +614,11 @@ def client_code_whole():
 
 
 @add_slide
+def client_code_gross():
+    img(src='/img/gross.gif')
+
+
+@add_slide
 def client_code_io():
     h3('Client code - iomain thread (2/3)')
     # should also use the "empty" version here
@@ -709,14 +714,25 @@ def slide_client_interpolation_3():
 
 
 @add_slide
-def slide_client_interp_code():
+def slide_client_interp_codeA():
     h3('Client-side extrapolation')
     code_block('client02d.py', size='0.5em',
-               lines=[156,166],
+               lines=[145, 155],
                highlights=[
                    'window.position_buffer.append',
                    'window.t',
                    'window.player_position_snapshot'
+               ])
+
+
+@add_slide
+def slide_client_interp_codeB():
+    h3('Client-side extrapolation')
+    code_block('client02d.py', size='0.5em',
+               lines=[89, 108],
+               highlights=[
+                   'predicted_position',
+                   'x = (self.t - 0) / (t1 - t0)',
                ])
 
 
