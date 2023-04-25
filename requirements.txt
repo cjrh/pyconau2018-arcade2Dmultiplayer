@@ -1,5 +1,5 @@
 arcade==1.3.4
-future==0.16.0
+future==0.18.3
 Pillow==9.0.1
 pyglet==1.3.2
 aiohttp==3.7.4
