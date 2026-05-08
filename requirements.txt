@@ -2,7 +2,7 @@ arcade==1.3.4
 future==0.16.0
 Pillow==9.0.1
 pyglet==1.3.2
-aiohttp==3.7.4
+aiohttp==3.8.5
 pyzmq==17.1.2
 pymunk==5.3.2
 dominate==2.3.1
